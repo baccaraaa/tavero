@@ -1,0 +1,81 @@
+{
+  "name": "tavero",
+  "version": "0.5.0",
+  "description": "UI consistency auditor for React apps, built for AI coding agents",
+  "keywords": [
+    "react",
+    "design-system",
+    "ui-consistency",
+    "audit",
+    "ai-agent",
+    "claude-code",
+    "cursor",
+    "vite",
+    "nextjs",
+    "playwright"
+  ],
+  "homepage": "https://github.com/baccaraaa/tavero#readme",
+  "bugs": {
+    "url": "https://github.com/baccaraaa/tavero/issues"
+  },
+  "author": "baccaraaa",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baccaraaa/tavero.git"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "tavero": "bin/tavero.js"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "SKILL.md",
+    "CHANGELOG.md",
+    "docs/AGENTS.snippet.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-assets.mjs",
+    "prepublishOnly": "npm run typecheck && npm run build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "tavero": "tsx src/cli/index.ts",
+    "pretest": "node scripts/copy-assets.mjs --ui-only",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "site:install": "npm --prefix site install",
+    "site:dev": "npm --prefix site run dev",
+    "site:gen": "tsx site/scripts/gen-reference.ts && tsx site/scripts/gen-demo.ts",
+    "site:build": "npm run build && npm run site:gen && npm --prefix site run build",
+    "site:audit": "tsx site/scripts/audit.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "commander": "^15.0.0",
+    "culori": "^4.0.2",
+    "playwright": "1.61.1",
+    "postcss": "^8.5.0",
+    "source-map": "^0.7.4",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/onest": "^5.3.1",
+    "@types/culori": "^4.0.1",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.0",
+    "next": "^16.4.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vite": "^8.0.0",
+    "vitest": "^5.0.0"
+  }
+}

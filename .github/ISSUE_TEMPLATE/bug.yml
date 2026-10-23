@@ -1,0 +1,31 @@
+name: Bug report
+description: Tavero printed something wrong, missed something, or crashed
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened and what you expected
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Tavero, Node, OS
+      placeholder: tavero 0.5.0, Node 22, macOS 15
+    validations:
+      required: true
+  - type: input
+    id: stack
+    attributes:
+      label: Stack
+      description: Vite or Next (version), React version, Tailwind or CSS variables
+      placeholder: Next 16.4 (Turbopack), React 19.2, Tailwind 4
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: The command and its output; for a wrong finding, `npx tavero finding <id> --json`
+      render: text

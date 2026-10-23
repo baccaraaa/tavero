@@ -1,0 +1,6 @@
+:root {
+  --color-brand: #3366ff;
+  --radius-card: 12px;
+}
+body { margin: 0; font-family: system-ui, sans-serif; }
+.card { border: 1px solid #e5e7eb; border-radius: var(--radius-card); padding: 16px; margin: 12px 0; background: #fff; }

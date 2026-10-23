@@ -1,0 +1,1 @@
+{ "name": "mini-vite", "private": true, "type": "module", "scripts": { "dev": "vite --strictPort" } }

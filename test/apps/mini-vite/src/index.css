@@ -1,0 +1,12 @@
+@import './tokens.css';
+body { font-family: Arial, sans-serif; margin: 0; }
+.card { background: hsl(var(--color-surface)); border: 1px solid #e5e7eb; border-radius: var(--radius-card); padding: var(--space-4); margin-bottom: 16px; box-shadow: var(--shadow-card); }
+.btn { border-radius: 6px; padding: 8px 14px; font-weight: var(--font-weight-bold); border: 0; }
+.btn-primary { background: var(--color-brand); color: #fff; }
+.btn-ghost { background: transparent; color: var(--color-brand); border: 1px solid var(--color-brand); }
+.pill { border-radius: 999px; padding: 6px 18px; background: #10b981; color: white; border: 0; }
+.many { display: flex; flex-wrap: wrap; gap: 2px; }
+.cell { width: 28px; height: 14px; font-size: 10px; background: #f3f4f6; }
+/* deliberate drift for the end-to-end findings test */
+.btn-danger { background: #ee5544; color: #fff; border-radius: 4px; }
+.raw-card { background: #fff; border: 1px solid #d1d5db; border-radius: 8px; padding: 12px; width: 320px; margin-top: 12px; }

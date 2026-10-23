@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+env:
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: node bin/tavero.js --help
+      - run: npm pack --dry-run
+      - name: Upload dev-server logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-server-logs
+          path: /tmp/tavero-mini-*.log
+          if-no-files-found: ignore

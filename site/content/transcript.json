@@ -1,0 +1,21 @@
+{
+  "model": "Claude Code with Opus 5.5",
+  "seconds": 29,
+  "turns": 10,
+  "lines": [
+    { "kind": "call", "text": "tavero_context" },
+    { "kind": "out", "text": "Action button is Button from src/components/Button.tsx (props: variant)" },
+    { "kind": "out", "text": "--acme-primary #3b5bdb · --acme-radius 10px · --acme-space 16px" },
+    { "kind": "call", "text": "tavero_findings rule=colors" },
+    { "kind": "out", "text": "f_ff30adc07c  Color #4263eb is not a project token" },
+    { "kind": "call", "text": "tavero_finding f_ff30adc07c" },
+    { "kind": "out", "text": "src/app.css:33  literal #4263eb in source" },
+    { "kind": "out", "text": "expected  --acme-primary #3b5bdb (ΔE 3.5)" },
+    { "kind": "note", "text": "edit src/app.css:33  background: #4263eb → var(--acme-primary)" },
+    { "kind": "call", "text": "tavero_scan routes=/billing rules=colors" },
+    { "kind": "call", "text": "tavero_diff" },
+    { "kind": "ok", "text": "resolved  f_ff30adc07c  Color #4263eb is not a project token" },
+    { "kind": "ok", "text": "resolved  f_18862a0332  Hardcoded color #4263eb in 1 place(s)" },
+    { "kind": "out", "text": "new  0" }
+  ]
+}

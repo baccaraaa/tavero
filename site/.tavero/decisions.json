@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "findings": {
+    "f_c75ac3d6a2": {
+      "canonical": {
+        "primary": "v_02eacceae1",
+        "allowed": [
+          "v_f81c412155",
+          "v_17a675db44"
+        ],
+        "names": {
+          "v_02eacceae1": "primary",
+          "v_f81c412155": "secondary",
+          "v_17a675db44": "copy"
+        }
+      },
+      "note": "Site buttons: Button primary and secondary for actions, CopyButton for the small copy control next to code.",
+      "status": null,
+      "at": "2026-10-23T16:59:25.920Z",
+      "places": 3
+    }
+  }
+}

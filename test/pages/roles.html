@@ -1,0 +1,29 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+  body { margin: 0; padding: 20px; background: #f6f7f9; font-family: Arial; }
+  .btn { background: #3366ff; color: #fff; border: 0; border-radius: 6px; padding: 8px 14px; }
+  .ghost { background: transparent; color: #3366ff; border: 1px solid #3366ff; border-radius: 6px; padding: 8px 14px; }
+  .linkbtn { display: inline-block; background: #10b981; color: #fff; padding: 8px 14px; border-radius: 999px; text-decoration: none; }
+  .plainlink { color: #3366ff; }
+  .icon { background: #eee; border: 0; border-radius: 50%; width: 32px; height: 32px; padding: 6px; }
+  .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; width: 300px; }
+  .shadowcard { background: #f6f7f9; box-shadow: 0 1px 2px rgba(0,0,0,.1); border-radius: 8px; padding: 12px; width: 300px; }
+  .flat { background: #f6f7f9; padding: 16px; border-radius: 12px; width: 300px; }
+  .tiny { background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 10px; width: 300px; }
+  .huge { background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 10px; width: 1300px; height: 800px; }
+</style></head><body>
+  <button class="btn" id="b1">Save</button>
+  <button class="ghost" id="b2">Cancel</button>
+  <a class="linkbtn" id="b3" href="#">Pill link</a>
+  <a class="plainlink" id="l1" href="#">Just a link</a>
+  <button class="icon" id="i1" aria-label="close"><span style="display:block;width:16px;height:16px;background:#333"></span></button>
+  <div class="card" id="c1"><h3>Title</h3><p>Body</p><button class="btn">Inside</button></div>
+  <section class="shadowcard" id="c2"><p>One</p><p>Two</p></section>
+  <div class="flat" id="n1"><p>One</p><p>Two</p></div>
+  <div class="tiny" id="n2"><p>Only child</p></div>
+  <div class="card" id="c3"><div class="card" id="c4"><p>a</p><p>b</p></div><p>c</p></div>
+  <div class="huge" id="n3"><p>a</p><p>b</p></div>
+  <nav><button class="btn" id="nv1">Nav item</button></nav>
+  <button id="w1" style="background:none;border:0;padding:0;display:block;width:400px;text-align:left"><h3>Clickable card</h3><p>row</p></button>
+  <button id="w2" style="background:none;border:0;padding:8px 12px;display:block;width:1200px;text-align:left">Wide row</button>
+  <button id="g1" style="background:none;border:0;padding:8px 12px;color:#3366ff">Ghost-ish</button>
+</body></html>

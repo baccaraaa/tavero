@@ -1,0 +1,60 @@
+export const metadata = { title: 'Quick start' };
+
+# Quick start
+
+Tavero needs Node 20 or later and a Vite or Next project on React 19 that runs in dev mode. It writes only to `<project>/.tavero/`.
+
+## Install
+
+```
+npm i -D tavero
+npx playwright install chromium
+```
+
+The second command downloads the browser Tavero scans with. Run it once per machine.
+
+## Log in
+
+If the app has a login, save a session once. A browser opens, you log in by hand, and the session is kept for later scans.
+
+```
+npx tavero login --url http://localhost:5173/login
+```
+
+With test credentials you can do it headlessly with `--email` and `--password`. Do not give an agent a person's real password.
+
+## Scan
+
+```
+npx tavero scan --url http://localhost:5173
+```
+
+Tavero starts the dev server if nothing answers on that port, finds the routes and renders each one at mobile, tablet and desktop widths. Every element is mapped to the React component and the source line that rendered it. A full scan takes a few minutes.
+
+## Read the findings
+
+```
+npx tavero findings
+npx tavero finding f_2d0ccc6aa1
+```
+
+`findings` lists the problems worst first: id, severity, rule, title and how many places. `finding` shows one with its evidence: the file and line, the current value and the expected token or component. Text output is capped at 20 rows (up to 200 with `--limit`), and every read command takes `--json`.
+
+## Give your agent the context
+
+```
+npx tavero context
+```
+
+A brief of about 1,500 tokens: the stack, the tokens, the canonical button and card components with their files and props, the dominant radius, spacing and type, and the open problems. Agents read it before writing UI. For the full loop through MCP, see [MCP and clients](/docs/mcp/).
+
+## Fix and rescan
+
+After a change, rescan only the routes and rules it touched. It takes seconds.
+
+```
+npx tavero scan --url http://localhost:5173 --routes /billing --rules colors
+npx tavero diff
+```
+
+A finding is closed when `diff` lists it as resolved. For a person, `npx tavero report` writes a self-contained HTML report into the scan folder, and `npx tavero ui` opens the [panel](/docs/panel/).

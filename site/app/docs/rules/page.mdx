@@ -1,0 +1,29 @@
+export const metadata = { title: 'Rules' };
+
+# Rules
+
+Four rules run on what the browser renders at mobile, tablet and desktop widths. Each finding has a stable id, a severity (high, medium or info), the components and source lines involved, and an `expected` value when there is one. Rescan a single rule with `--rules`.
+
+## Buttons
+
+Distinct text-button and icon-button styles, with the components that render each one. A style is its background, text color, border, radius, padding, font size and weight, and shadow. The rule also reports pairs of styles that differ in only a value or two, and `<button>` elements written in page markup instead of a button component.
+
+When a person picks a canonical variant in the [panel](/docs/panel/), the other variants get it as their `expected` value.
+
+## Cards
+
+Card-like containers that differ in background, border, radius, padding or shadow, near pairs, and cards built inline. Card detection is heuristic, so this rule is preliminary: treat it as a hint.
+
+## Colors
+
+- Colors outside the project's tokens, with the nearest token and the color difference (ΔE). A close token means "use this one"; a distant one means "add a token".
+- Tailwind default-palette colors in a project that declares its own palette.
+- Pairs of near-identical colors.
+- Hardcoded literals in the source that render in the scan, with the file and line.
+- Browser defaults, such as the black text of an unstyled `<button>`, are reported as info.
+
+When a color matches a family of tokens, the suggestion names the family.
+
+## Scales
+
+Radius, padding, gap, font size, font weight and shadow values compared to the scale your tokens declare, and the typography combinations in use.

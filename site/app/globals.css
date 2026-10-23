@@ -1,0 +1,48 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+/* next/font hashes family names; the tokens' font stacks point at its variables on the site. */
+:root {
+  --font-sans: var(--font-onest), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --font-serif: var(--font-instrument), Georgia, serif;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-wash: var(--wash);
+  --color-paper: var(--paper);
+  --color-accent: var(--accent);
+  --color-high: var(--high);
+  --color-medium: var(--medium);
+  --color-info: var(--info);
+  --color-ok: var(--ok);
+  --radius-lg: var(--r-lg);
+  --radius-md: var(--r-md);
+  --radius-sm: var(--r-sm);
+  --shadow-e2: var(--e2);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+  --text-meta: var(--font-size-meta);
+  --text-ui: var(--font-size-ui);
+  --text-body: var(--font-size-body);
+  --text-h3: var(--font-size-h3);
+  --text-lead: var(--font-size-lead);
+  --text-lead-lg: var(--font-size-lead-lg);
+  --text-h2: var(--font-size-h2);
+  --text-d2: var(--font-size-d2);
+  --text-d2-lg: var(--font-size-d2-lg);
+  --text-d1: var(--font-size-d1);
+  --text-d1-lg: var(--font-size-d1-lg);
+}
+
+html { background: var(--paper); color: var(--ink); }
+body { font-family: var(--font-sans); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+::selection { background: var(--ink); color: var(--paper); }
+a, button { transition: color var(--dur), background-color var(--dur), border-color var(--dur); }

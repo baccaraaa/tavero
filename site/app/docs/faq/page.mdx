@@ -1,0 +1,31 @@
+export const metadata = { title: 'FAQ' };
+
+# FAQ
+
+## Which apps does it work with?
+
+React 19 apps running in dev mode, on Vite or Next. Tailwind 3 and 4 and CSS custom properties are read as tokens. Tavero needs nothing added to the project: it reads the debug data React keeps in dev builds.
+
+## Why does it need the dev server?
+
+Dev builds keep, for every element, the component that rendered it and where in the source it was written. Production builds strip this. Without it Tavero could say that a button differs, but not which file to change.
+
+## What about pages behind a login?
+
+Run `tavero login` once and log in in the browser that opens. The session is saved in `.tavero/` and used for every scan. If a session expires, the scan reports the routes that landed on the login page.
+
+## What does it write?
+
+Only `<project>/.tavero/`: scans, crops, the saved session and `decisions.json`. It never changes your code. Add `.tavero/` to `.gitignore` except `decisions.json`, which you can commit to share decisions.
+
+## How fast is a rescan?
+
+A full scan of a few dozen routes at three widths takes minutes. A rescan of one route and one rule takes seconds, and findings from routes you did not rescan are carried over. After a partial rescan `diff` says which routes may still carry a finding; run a full scan to confirm.
+
+## Does it send my code anywhere?
+
+No. Tavero runs on your machine and makes no network requests of its own beyond your dev server and the backend it calls. There is no account and no telemetry.
+
+## Is it free?
+
+Yes. Tavero is free and open source under the MIT license.

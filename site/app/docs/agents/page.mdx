@@ -1,0 +1,39 @@
+import { ToolTable } from '@/components/ToolTable';
+
+export const metadata = { title: 'For agents' };
+
+# For agents
+
+Tavero is built to be called by a coding agent. Outputs are compact and paginated, ids are stable across scans, and every finding says what to rescan after the fix.
+
+## Instructions file
+
+Paste this into the instructions file your agent reads: `AGENTS.md` (Codex, Cursor, VS Code and GitHub Copilot, Gemini CLI, Windsurf and others), `CLAUDE.md` (Claude Code) or `GEMINI.md` (Gemini CLI).
+
+```
+## UI consistency (Tavero)
+- Before adding or changing UI, call `tavero_context` (CLI: `tavero context`) and reuse the components and tokens it names.
+- After UI changes, call `tavero_scan` with the changed `routes`, then `tavero_findings` (CLI: `tavero scan --url <dev url> --routes …`, `tavero findings`).
+- Work through findings with `tavero_finding`; its `expected` field is the token or component to use.
+- Close a finding with a partial `tavero_scan` (`routes` + `rules`) and `tavero_diff`; it is done when listed as resolved.
+- Never write under `.tavero/`; if pages land on a login screen, ask a human to run `tavero login`.
+- Full guidance: `node_modules/tavero/SKILL.md`.
+```
+
+## Agent Skill
+
+The package includes `SKILL.md`, an [Agent Skill](https://agentskills.io/) with the full workflow: setup, the loop, how to read findings and what not to do. For Claude Code, copy it to `.claude/skills/tavero/SKILL.md`.
+
+## The loop
+
+1. `tavero_context` before writing UI.
+2. `tavero_findings`, then `tavero_finding` for one problem.
+3. Edit the code, using the token or component named in `expected`.
+4. `tavero_scan` with only the `routes` and `rules` touched.
+5. `tavero_diff`. The finding is done when it is listed as resolved.
+
+Findings a person marked as Fix come first. Findings marked as intended are hidden. On variants findings, `expected` names the canonical a person chose.
+
+## Tools
+
+<ToolTable />

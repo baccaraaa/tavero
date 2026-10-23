@@ -1,0 +1,14 @@
+/* Acme design tokens. The pages are supposed to use only these. */
+:root {
+  --acme-ink: #1d2433;
+  --acme-muted: #5b6475;
+  --acme-line: #e4e7ec;
+  --acme-surface: #ffffff;
+  --acme-bg: #f6f7f9;
+  --acme-primary: #3b5bdb;
+  --acme-primary-ink: #ffffff;
+  --acme-danger: #d6453d;
+  --acme-radius: 10px;
+  --acme-radius-sm: 6px;
+  --acme-space: 16px;
+}

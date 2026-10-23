@@ -1,0 +1,33 @@
+node_modules/
+dist/
+coverage/
+*.tgz
+.DS_Store
+*.log
+.env*
+**/.tavero/*
+# the website's own design decisions, read by its audit
+!site/.tavero/decisions.json
+
+# copied from design/ and @fontsource by scripts/copy-assets.mjs
+src/ui/tokens.css
+src/ui/fonts/
+
+# test apps
+test/apps/*/node_modules/
+test/apps/*/.next/
+test/apps/*/next-env.d.ts
+demo/acme/node_modules/
+
+# website
+site/node_modules/
+site/.next/
+site/out/
+site/generated/
+site/public/demo/
+site/public/demo-assets/
+site/public/audit/
+site/app/tokens.css
+site/next-env.d.ts
+site/tsconfig.tsbuildinfo
+site/.audit/

@@ -1,0 +1,12 @@
+/* Tavero design tokens: the only source of color, type, space, radius and elevation for the site and the panel. */
+:root {
+  --ink:#141414; --ink-2:#4a4a4a; --ink-3:#6f6f6f; --line:#e3e3e3; --line-2:#d0d0d0; --wash:#f7f7f6; --paper:#ffffff;
+  --accent:#1f5bd8; --high:#b42318; --medium:#9a5b06; --info:#4a5565; --ok:#1d6b3a;
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px; --s-6:32px; --s-7:48px; --s-8:72px; --s-9:112px;
+  --r-lg:12px; --r-md:8px; --r-sm:6px;
+  --font-size-xs:12px; --font-size-meta:13px; --font-size-ui:14px; --font-size-body:15px; --font-size-h3:16px; --font-size-lead:17px; --font-size-lead-lg:19px;
+  --font-size-h2:20px; --font-size-d2:44px; --font-size-d2-lg:48px; --font-size-d1:64px; --font-size-d1-lg:72px;
+  --e2:0 1px 2px rgba(20,20,20,.05), 0 4px 12px rgba(20,20,20,.04);
+  --font-sans:'Onest', system-ui, sans-serif; --font-mono:'IBM Plex Mono', ui-monospace, monospace; --font-serif:'Instrument Serif', Georgia, serif;
+  --dur:120ms;
+}

@@ -1,0 +1,32 @@
+export const metadata = { title: 'Panel and decisions' };
+
+# Panel and decisions
+
+```
+npx tavero ui --open
+```
+
+The panel is a local page for the person behind the agent, at `http://127.0.0.1:4747`. Go through the findings with the keyboard (arrow keys, then 1 to 4) and decide. The agent sees each decision on its next call, without a rescan. You can see the panel on the Acme demo on the [demo page](/demo/).
+
+## Decisions
+
+| Decision | What the agent sees |
+|---|---|
+| Fix | The finding comes first in `tavero_findings`, marked as confirmed work. |
+| Intended | Hidden from `findings` and `context`. It comes back if the finding gains new places. |
+| Canonical | On a button or card variants finding: the reference variant and any allowed ones, picked with a crop of each at every width and optionally named ("primary", "ghost"). Other variants get it as `expected`, and `context` names it as the canonical component. |
+| Note | Free text delivered with `tavero_finding`. |
+
+## Where decisions live
+
+Decisions are stored in `.tavero/decisions.json`, keyed by the stable finding ids, so they survive rescans. Commit the file to share them with your team and its agents. Agents never write it.
+
+The panel listens on 127.0.0.1 only and accepts writes only from its own pages.
+
+## Static export
+
+```
+npx tavero ui --export ./panel
+```
+
+Writes a read-only copy of the panel for the latest scan: plain HTML files you can open or host anywhere. Decisions are shown but cannot be changed. The [demo](/demo/) on this site is such an export.

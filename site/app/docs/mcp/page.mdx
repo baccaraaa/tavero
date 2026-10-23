@@ -1,0 +1,33 @@
+import { McpConfigs } from '@/components/McpConfigs';
+
+export const metadata = { title: 'MCP and clients' };
+
+# MCP and clients
+
+`tavero mcp` is an MCP server on stdio for one project: the current folder, or the one passed with `--dir`. It gives the agent nine tools, so it can run the whole loop without a shell. The tools are listed in [For agents](/docs/agents/).
+
+## Connect your client
+
+Print the config for your client and paste it into the file it names. Nothing is written for you.
+
+```
+npx tavero mcp --print-config claude
+```
+
+The clients are `claude`, `cursor`, `codex`, `gemini`, `antigravity`, `vscode` and `windsurf`. Each tab below is the output of that command.
+
+<McpConfigs />
+
+Add `--dir frontend` to the arguments when the app lives in a subfolder.
+
+## Timeouts
+
+A full scan takes minutes. The Codex and Gemini CLI configs set longer tool timeouts for that reason. After a fix the agent passes `routes` and `rules` to `tavero_scan`, which takes seconds. Scans stream progress, run one at a time and can be cancelled. A dev server the tool starts stays up for later scans.
+
+## Windows
+
+Codex is a native binary and may not resolve the `npx` shim on Windows, so the Codex config printed on native Windows runs `npx` through `cmd /c`. The other clients use `npx` directly.
+
+## Logins
+
+Logging in stays a human step. If pages land on a login screen, the scan says so, and a person runs `tavero login` in a terminal once.
