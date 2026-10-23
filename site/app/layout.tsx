@@ -11,9 +11,10 @@ const mono = IBM_Plex_Mono({ weight: ['400', '500'], subsets: ['latin'], variabl
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
-  title: { default: 'Tavero: consistent UI from your coding agent', template: '%s · Tavero' },
+  title: { default: SITE.title, template: '%s · Tavero' },
   description: SITE.description,
-  openGraph: { title: 'Tavero', description: SITE.description, url: SITE.url, siteName: 'Tavero', type: 'website' },
+  openGraph: { title: SITE.title, description: SITE.description, url: SITE.url, siteName: 'Tavero', type: 'website' },
+  twitter: { card: 'summary_large_image', title: SITE.title, description: SITE.description },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

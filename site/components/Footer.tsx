@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SITE } from '@/lib/site';
+import { EXTERNAL, SITE } from '@/lib/site';
 import { readAudit } from '@/lib/audit';
 
 export function Footer() {
@@ -10,8 +10,8 @@ export function Footer() {
         <span>Tavero · MIT license</span>
         <Link href="/docs/quick-start/" className="hover:text-ink">Docs</Link>
         <Link href="/demo/" className="hover:text-ink">Demo</Link>
-        <a href={SITE.npm} className="hover:text-ink">npm</a>
-        {SITE.github && <a href={SITE.github} className="hover:text-ink">GitHub</a>}
+        <a href={SITE.npm} {...EXTERNAL} className="hover:text-ink">npm</a>
+        {SITE.github && <a href={SITE.github} {...EXTERNAL} className="hover:text-ink">GitHub</a>}
         <Link href="/audit/" className="hover:text-ink md:ml-auto">This site is audited by Tavero{a ? `: ${a.high + a.medium} high and medium findings` : ''}</Link>
       </div>
     </footer>

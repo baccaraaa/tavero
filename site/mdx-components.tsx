@@ -1,5 +1,6 @@
 import type { MDXComponents } from 'mdx/types';
 import { CodeBlock } from '@/components/CodeBlock';
+import { EXTERNAL } from '@/lib/site';
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -10,7 +11,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ul: (p) => <ul className="my-4 list-disc pl-6 text-ink-2 marker:text-ink-3" {...p} />,
     ol: (p) => <ol className="my-4 list-decimal pl-6 text-ink-2 marker:text-ink-3" {...p} />,
     li: (p) => <li className="my-1" {...p} />,
-    a: (p) => <a className="text-accent underline underline-offset-3" {...p} />,
+    a: (p) => <a className="text-accent underline underline-offset-3" {...(/^https?:/.test(p.href ?? '') ? EXTERNAL : {})} {...p} />,
     code: (p) => <code className="font-mono text-meta text-ink" {...p} />,
     pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
     table: (p) => <div tabIndex={0} className="my-6 overflow-x-auto"><table className="w-full border-collapse text-ui" {...p} /></div>,

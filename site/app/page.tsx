@@ -6,6 +6,24 @@ import { Transcript } from '@/components/Transcript';
 import { ClientConfigs } from '@/components/ClientConfigs';
 import { Card } from '@/components/Card';
 import { demo, reference, transcript } from '@/lib/data';
+import { pageMeta } from '@/lib/seo';
+import { SITE } from '@/lib/site';
+
+export const metadata = pageMeta({ description: SITE.description, path: '/' });
+
+/** Structured data for search engines: what Tavero is, that it is free, where its code lives. */
+const LD = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Tavero',
+  description: SITE.description,
+  url: SITE.url,
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Windows, macOS, Linux',
+  license: 'https://opensource.org/licenses/MIT',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  sameAs: [SITE.github, SITE.npm].filter(Boolean),
+};
 
 const STEPS = [
   ['Read the context', 'Canonical components, tokens and conventions, in about 1,500 tokens.'],
@@ -37,6 +55,7 @@ export default function Home() {
   const drift = demo.buttons.rows.filter((r) => !r.canonical);
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(LD) }} />
       <div className="mx-auto max-w-[1120px] px-6 pt-18 pb-18 md:px-8 md:pt-28">
         <h1 className="max-w-[12ch] font-serif text-d2-lg leading-none md:max-w-[16ch] md:text-d1-lg">Keep the UI your agent writes consistent.</h1>
         <p className="mt-6 max-w-[50ch] text-lead md:text-lead-lg text-ink-2">

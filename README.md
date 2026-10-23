@@ -1,16 +1,17 @@
 <p align="center">
-  <img src="docs/images/logo.svg" width="64" height="64" alt="Tavero">
+  <img src="https://raw.githubusercontent.com/baccaraaa/tavero/master/docs/images/logo.svg" width="64" height="64" alt="Tavero">
 </p>
 
 <h1 align="center">Tavero</h1>
 
 <p align="center">
-  Keep the UI your agent writes consistent.
+  Keep the UI your agent writes consistent.<br>
+  <a href="https://taveroui.com">taveroui.com</a> · <a href="https://taveroui.com/docs/quick-start/">Docs</a> · <a href="https://taveroui.com/demo/">Demo</a>
 </p>
 
 <p align="center">
   <a href="https://github.com/baccaraaa/tavero/actions/workflows/ci.yml"><img src="https://github.com/baccaraaa/tavero/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-141414" alt="MIT license"></a>
+  <a href="https://github.com/baccaraaa/tavero/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-141414" alt="MIT license"></a>
   <img src="https://img.shields.io/badge/node-%3E%3D20-141414" alt="Node 20 or later">
   <img src="https://img.shields.io/badge/React-19-141414" alt="React 19">
 </p>
@@ -18,7 +19,7 @@
 Tavero scans your running React app, finds drift in buttons, cards, colors and spacing, and gives your coding agent each fix with the file, the line and the token to use. It runs on your machine, as a CLI, an MCP server for Claude Code, Cursor, Codex and other agents, and a local panel where you decide what is intended.
 
 <p align="center">
-  <img src="docs/images/finding.webp" width="840" alt="A Tavero finding on the Acme demo: 7 text button styles, each with its crop, component, file and line, and the canonical Button chosen in the panel">
+  <img src="https://raw.githubusercontent.com/baccaraaa/tavero/master/docs/images/finding.webp" width="840" alt="A Tavero finding on the Acme demo: 7 text button styles, each with its crop, component, file and line, and the canonical Button chosen in the panel">
 </p>
 
 <sub>A real finding from the Acme demo in this repository (`demo/acme`): six pages scanned at three widths.</sub>
@@ -73,7 +74,7 @@ npx tavero mcp --print-config vscode       # .vscode/mcp.json (GitHub Copilot)
 npx tavero mcp --print-config windsurf     # ~/.codeium/windsurf/mcp_config.json
 ```
 
-Then paste [`docs/AGENTS.snippet.md`](docs/AGENTS.snippet.md) into `AGENTS.md`, `CLAUDE.md` or `GEMINI.md`, so the agent reads the design context before writing UI. [`SKILL.md`](SKILL.md) is an Agent Skill with the full workflow.
+Then paste [`docs/AGENTS.snippet.md`](https://github.com/baccaraaa/tavero/blob/master/docs/AGENTS.snippet.md) into `AGENTS.md`, `CLAUDE.md` or `GEMINI.md`, so the agent reads the design context before writing UI. [`SKILL.md`](https://github.com/baccaraaa/tavero/blob/master/SKILL.md) is an Agent Skill with the full workflow.
 
 A recorded run of Claude Code on the Acme demo, with no shell, 29 seconds:
 
@@ -117,7 +118,7 @@ npx tavero ui --open   # http://127.0.0.1:4747
 ```
 
 <p align="center">
-  <img src="docs/images/panel.webp" width="840" alt="The Tavero panel: a list of findings and, for the button styles finding, every variant with its crop at three widths and a choice of the canonical one">
+  <img src="https://raw.githubusercontent.com/baccaraaa/tavero/master/docs/images/panel.webp" width="840" alt="The Tavero panel: a list of findings and, for the button styles finding, every variant with its crop at three widths and a choice of the canonical one">
 </p>
 
 A local panel for the person behind the agent. Go through the findings with the keyboard and decide. The agent sees each decision on its next call, without a rescan.
@@ -148,7 +149,7 @@ npm run typecheck
 npm run build
 ```
 
-The website lives in [`site/`](site/) (Next.js static export). `npm run site:install && npm run site:dev` runs it; `npm run site:audit` runs its gates: Tavero on the site itself with 0 high and medium findings, Lighthouse, axe and three widths.
+The website lives in [`site/`](https://github.com/baccaraaa/tavero/tree/master/site) (Next.js static export). `npm run site:install && npm run site:dev` runs it; `npm run site:audit` runs its gates: Tavero on the site itself with 0 high and medium findings, Lighthouse, axe and three widths.
 
 ```
 src/
@@ -168,8 +169,8 @@ design/      design tokens shared by the panel and the website
 site/        the website
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+See [CONTRIBUTING.md](https://github.com/baccaraaa/tavero/blob/master/CONTRIBUTING.md) before opening a pull request.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/baccaraaa/tavero/blob/master/LICENSE)

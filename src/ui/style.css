@@ -1,4 +1,4 @@
-/* Tavero panel. Every color, size and radius comes from tokens.css (shared with tavero.com). */
+/* Tavero panel. Every color, size and radius comes from tokens.css (shared with taveroui.com). */
 @font-face{font-family:'Onest';font-weight:400;font-display:optional;src:url(fonts/onest-latin-400-normal.woff2) format('woff2')}
 @font-face{font-family:'Onest';font-weight:500;font-display:optional;src:url(fonts/onest-latin-500-normal.woff2) format('woff2')}
 @font-face{font-family:'Onest';font-weight:600;font-display:optional;src:url(fonts/onest-latin-600-normal.woff2) format('woff2')}

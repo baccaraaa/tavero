@@ -1,7 +1,8 @@
 import { Button } from '@/components/Button';
 import { demo } from '@/lib/data';
+import { pageMeta } from '@/lib/seo';
 
-export const metadata = { title: 'Demo', description: 'The Tavero panel on a scan of the Acme demo dashboard.' };
+export const metadata = pageMeta({ title: 'Demo', description: 'Tavero on a demo React dashboard with deliberate UI drift: the findings, the crops and the panel where a person picks the canonical button.', path: '/demo/' });
 
 export default function DemoPage() {
   const f = demo.findings;

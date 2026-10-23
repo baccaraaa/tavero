@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { DOCS, docHref } from '@/lib/docs';
+import { pageMeta } from '@/lib/seo';
 
-export const metadata = { title: 'Docs' };
+export const metadata = pageMeta({ title: 'Docs', description: 'Tavero documentation: quick start, MCP setup for coding agents, CLI reference, the four rules, the panel and the FAQ.', path: '/docs/' });
 
 export default function DocsIndex() {
   return (

@@ -7,7 +7,7 @@
 - Attribution walks through library server components: an element rendered by `next/link` inside a server `Button` is credited to `Button`.
 - A button's rendered height is no longer part of its style signature, so the same style at two heights is one variant.
 - `demo/acme`: a small Vite dashboard with deliberate drift, used for the website's demo and tests.
-- `site/`: the tavero.com website (Next.js static export): landing, docs, demo and the site's own audit (`npm run site:build`, `npm run site:audit`).
+- `site/`: the taveroui.com website (Next.js static export): landing, docs, demo and the site's own audit (`npm run site:build`, `npm run site:audit`).
 
 ## 0.4.0 — 2026-10-23
 

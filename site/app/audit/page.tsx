@@ -1,6 +1,7 @@
 import { readAudit } from '@/lib/audit';
+import { pageMeta } from '@/lib/seo';
 
-export const metadata = { title: 'Audit', description: 'The Tavero scan of this site.' };
+export const metadata = pageMeta({ title: 'Audit', description: 'This site is checked by Tavero itself before it is published: 0 high and medium findings, plus Lighthouse, axe and three screen widths.', path: '/audit/' });
 
 export default function AuditPage() {
   const a = readAudit();
