@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { classifyToken, parseColor, findTokenDeclarations, buildTokens } from '../../src/static/tokens.js';
+import { classifyToken, parseColor, findTokenDeclarations, buildTokens, resolveStaticValue } from '../../src/static/tokens.js';
 import { makeTmpProject } from '../helpers/tmp.js';
 
 describe('tokens', () => {
@@ -32,9 +32,9 @@ describe('tokens', () => {
       'src/tokens.css': `:root {\n  --lp-bg: 222 47% 11%;\n  --lp-accent: 221 83% 53%;\n}\n`,
     });
     const map = await findTokenDeclarations([`${p.dir}/src/index.css`], p.dir);
-    expect(map.get('--lp-bg')).toEqual({ file: 'src/tokens.css', line: 2 });
-    expect(map.get('--lp-accent')).toEqual({ file: 'src/tokens.css', line: 3 });
-    expect(map.get('--radius')).toEqual({ file: 'src/index.css', line: 3 });
+    expect(map.get('--lp-bg')).toEqual({ file: 'src/tokens.css', line: 2, value: '222 47% 11%' });
+    expect(map.get('--lp-accent')).toEqual({ file: 'src/tokens.css', line: 3, value: '221 83% 53%' });
+    expect(map.get('--radius')).toEqual({ file: 'src/index.css', line: 3, value: '8px' });
     p.cleanup();
   });
   it('assembles tokens: dedupe by name, skip --tw-, resolve values, attach sources', () => {
@@ -50,5 +50,24 @@ describe('tokens', () => {
     expect(tokens.map((t) => t.name)).toEqual(['--lp-bg', '--radius']);
     expect(tokens[0]).toMatchObject({ id: '--lp-bg', kind: 'color', value: '222 47% 11%', resolved: '#0f1729', theme: 'light', source: { file: 'src/tokens.css', line: 2 } });
     expect(tokens[1]).toMatchObject({ kind: 'radius', resolved: '0.5rem', source: { source: 'runtime' } });
+  });
+  it('resolves var() and simple calc() in source-declared values', () => {
+    const lookup = (n: string) => ({ '--radius': '0.625rem', '--gap': '8px' } as Record<string, string>)[n];
+    expect(resolveStaticValue('calc(var(--radius) + 4px)', lookup)).toBe('14px');
+    expect(resolveStaticValue('calc(var(--radius) - 4px)', lookup)).toBe('6px');
+    expect(resolveStaticValue('var(--radius)', lookup)).toBe('0.625rem');
+    expect(resolveStaticValue('var(--missing, 2px)', lookup)).toBe('2px');
+    expect(resolveStaticValue('calc(var(--gap) * 2)', lookup)).toBe('16px');
+    expect(resolveStaticValue('var(--missing)', lookup)).toBeNull();
+  });
+  it('adds tokens that exist only in source CSS (Tailwind 4 @theme inline does not emit them at runtime)', async () => {
+    const p = makeTmpProject({ 'src/theme.css': ['@theme inline {', '  --radius-sm: calc(var(--radius) - 4px);', '  --radius-xl: calc(var(--radius) + 4px);', '}', ':root { --radius: 0.625rem; }', ''].join('\n') });
+    const declMap = await findTokenDeclarations([`${p.dir}/src/theme.css`], p.dir);
+    const tokens = buildTokens([{ name: '--radius', value: '0.625rem' }], { '--radius': '0.625rem' }, declMap);
+    expect(tokens.map((t) => [t.name, t.kind, t.resolved])).toEqual([
+      ['--radius', 'radius', '0.625rem'], ['--radius-sm', 'radius', '6px'], ['--radius-xl', 'radius', '14px'],
+    ]);
+    expect(tokens[2].source).toEqual({ file: 'src/theme.css', line: 3 });
+    p.cleanup();
   });
 });

@@ -19,7 +19,7 @@ function mergeEntry(into: Record<string, CountEntry>, from: Record<string, Count
 type ComponentAcc = Component & { propSet: Set<string>; pageSet: Set<string> };
 
 /** Pure aggregation of page records into the scan-level files. */
-export function aggregate(pages: PageRecord[], opts: { declMap: Map<string, { file: string; line: number }> }): { components: Component[]; instances: Instance[]; samples: StyleSample[]; colors: ColorCounts; scales: ScaleCounts; tokens: Token[] } {
+export function aggregate(pages: PageRecord[], opts: { declMap: Map<string, { file: string; line: number; value?: string }> }): { components: Component[]; instances: Instance[]; samples: StyleSample[]; colors: ColorCounts; scales: ScaleCounts; tokens: Token[] } {
   const comps = new Map<string, ComponentAcc>();
   const instances: Instance[] = [];
   const samples: StyleSample[] = [];

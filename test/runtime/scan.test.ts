@@ -77,7 +77,7 @@ describe('scan', () => {
     const pages: Array<{ done: number; total: number | null; line: string }> = [];
     const second = await scan({ projectDir: MINI_VITE_DIR, url: MINI_VITE_URL, out, routes: ['/', '/many'], viewports: [DEFAULT_VIEWPORTS[0], DEFAULT_VIEWPORTS[2]], onPage: (p) => pages.push(p) });
     expect(pages.map((p) => [p.done, p.total])).toEqual([[1, 4], [2, 4], [3, 4], [4, 4]]);
-    expect(pages[0].line).toMatch(/^mobile\s+\/\s+ok/);
+    expect(pages[0].line).toMatch(/^desktop\s+\/\s+ok/); // widest first: that pass discovers the routes
     expect(basename(second.dir)).toMatch(/^\d{4}-\d\d-\d\dT\d\d-\d\d-\d\d-\d{3}$/);
     const ac = new AbortController();
     await expect(scan({ projectDir: MINI_VITE_DIR, url: MINI_VITE_URL, out, routes: ['/', '/many'], viewports: [DEFAULT_VIEWPORTS[0]], signal: ac.signal, onPage: () => ac.abort() })).rejects.toMatchObject({ code: 'cancelled' });

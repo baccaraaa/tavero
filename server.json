@@ -14,12 +14,12 @@
       "mimeType": "image/svg+xml"
     }
   ],
-  "version": "0.5.1",
+  "version": "0.6.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "tavero",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "transport": {
         "type": "stdio"
       },

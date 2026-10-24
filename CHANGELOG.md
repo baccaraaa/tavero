@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.6.0 — 2026-10-24
+
+Found by running Tavero on open-source React dashboards (satnaing/shadcn-admin, arhamkhnz/next-shadcn-admin-dashboard).
+
+- Routes are discovered at the widest viewport first. Phone layouts hide the navigation behind a menu button, so a crawl that started at mobile width found 2 routes of 28 in shadcn-admin. Delete `.tavero/routes.json` from earlier scans to rediscover.
+- TanStack Router: routes are read from `routeTree.gen.ts`; params and splats are skipped with a reason.
+- Declared routes are deduped by exact path: `/401`, `/403` and `/404` are separate pages; only crawled links collapse ids (`/items/1`, `/items/2`).
+- Elements no app component renders are left out of findings: devtools toggles (TanStack Router and Query devtools), widgets mounted by other frameworks or scripts. The page itself (`html`, `body`) still counts.
+- Elements entirely outside the page (a skip link waiting for focus) are left out.
+- A `<button>` with a widget role (checkbox, switch, combobox, tab, radio, option…) is a form control, not a button; shadcn's sidebar (`data-slot="sidebar"`) counts as navigation, and navigation icon buttons are left out like text ones.
+- An unstyled button with more than 40 characters of text or 48px or more in height is a list row (chat, mail, a clickable card), not an action button; `role="alert"`, `status` and `dialog` boxes are not cards.
+- Element text leaves out `<style>` and `<script>` content (chart libraries inject styles into elements).
+- Default-exported functions are indexed whatever their case: Next pages written as `export default function page()` get their file, instead of `LinkComponent` from next/link.
+- Next on Windows: Turbopack source maps write the drive letter in lower case (`c:/`); source paths are project-relative again instead of absolute.
+- Tokens declared in source CSS but absent at runtime are read too, with `var()` and simple `calc()` resolved: Tailwind 4 `@theme inline` (`--radius-xl: calc(var(--radius) + 4px)`) no longer makes 14px "off the scale".
+- Button styles are rated high only when five or more styles include at least two from components other than the main one; many styles of one shared component (its variant and size props) are medium, and the summary says how many come from it.
+- Near-duplicate pairs (buttons and cards) are looked for only between different components: two sizes of one `Button` are its API. In next-shadcn-admin-dashboard this removed 16 of 17 button pairs and kept `Button` vs `DropdownMenuTrigger`.
+
 ## 0.5.1 — 2026-10-24
 
 - Listed in the official MCP Registry as `io.github.baccaraaa/tavero` (`mcpName` in `package.json`, `server.json`).

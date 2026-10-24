@@ -19,4 +19,9 @@ describe('classifySource', () => {
     expect(classifySource('file:///home/runner/work/app/node_modules/next/dist/client/link.js', lin).app).toBe(false);
     expect(classifySource('/@vite/client', win).app).toBe(false);
   });
+  it('strips the project prefix whatever the case of the drive letter (Turbopack writes c:/, the project is C:/)', () => {
+    const win = { projectDir: 'C:\\Coding\\app', baseUrl: 'http://localhost:3000' };
+    expect(classifySource('file:///c:/Coding/app/src/app/page.tsx', win)).toEqual({ path: 'src/app/page.tsx', app: true });
+    expect(classifySource('c:/Coding/app/src/x.tsx', win)).toEqual({ path: 'src/x.tsx', app: true });
+  });
 });

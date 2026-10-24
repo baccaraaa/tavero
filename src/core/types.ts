@@ -36,7 +36,7 @@ export interface Component {
 export interface Rect { x: number; y: number; w: number; h: number }
 export interface Instance { id: string; componentId: string; route: string; viewport: string; rect: Rect; hosts: number; crop?: string }
 
-export type RouteSource = 'cli' | 'routes.json' | 'next' | 'react-router' | 'crawl';
+export type RouteSource = 'cli' | 'routes.json' | 'next' | 'react-router' | 'tanstack-router' | 'crawl';
 export type RouteStatus = 'pending' | 'ok' | 'failed' | 'unauthenticated' | 'no-react' | 'skipped';
 export interface RouteEntry { path: string; source: RouteSource; status: RouteStatus; reason?: string }
 

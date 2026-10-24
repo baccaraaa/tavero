@@ -30,6 +30,15 @@ describe('route planning', () => {
     q.setStatus('/a', 'ok');
     expect(q.entries()[0].status).toBe('ok');
   });
+  it('RouteQueue collapses ids only for crawled links: declared routes like /401 and /403 are separate pages', () => {
+    const q = new RouteQueue(10);
+    expect(q.add('/401', 'tanstack-router', 0)).toBe(true);
+    expect(q.add('/403', 'tanstack-router', 0)).toBe(true);
+    expect(q.add('/403', 'tanstack-router', 0)).toBe(false);
+    expect(q.add('/items/1', 'crawl', 1)).toBe(true);
+    expect(q.add('/items/2', 'crawl', 1)).toBe(false);
+    expect(q.add('/404', 'crawl', 1)).toBe(false);
+  });
   it('planRoutes prefers cli, then routes.json, then discovery', async () => {
     const p = makeTmpProject({
       'package.json': JSON.stringify({ dependencies: { next: '16' } }),
@@ -45,6 +54,18 @@ describe('route planning', () => {
     await writeRoutesFile(out, [{ path: '/custom', source: 'routes.json', status: 'pending' }]);
     plan = await planRoutes({ project, outDir: out });
     expect(plan.queue.entries().map((e) => e.path)).toEqual(['/custom']);
+    p.cleanup();
+  });
+  it('planRoutes reads a TanStack Router route tree in a Vite project', async () => {
+    const p = makeTmpProject({
+      'package.json': JSON.stringify({ dependencies: { vite: '8', '@tanstack/react-router': '1' } }),
+      'src/main.tsx': '',
+      'src/routeTree.gen.ts': ["export interface FileRoutesByFullPath {", "  '/': typeof A", "  '/users/': typeof B", "  '/errors/$error': typeof C", '}'].join('\n'),
+    });
+    const project = await detectProject(p.dir);
+    const { queue, warnings } = await planRoutes({ project, outDir: `${p.dir}/.tavero` });
+    expect(queue.entries().map((e) => [e.path, e.source])).toEqual([['/', 'tanstack-router'], ['/users', 'tanstack-router']]);
+    expect(warnings).toEqual(['skipped /errors/$error: dynamic segment needs an example; add it to routes.json or --routes']);
     p.cleanup();
   });
 });

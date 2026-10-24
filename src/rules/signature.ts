@@ -87,6 +87,9 @@ export function nearVariants(variants: Variant[]): Array<{ a: Variant; b: Varian
   for (let i = 0; i < variants.length; i++) {
     for (let j = i + 1; j < variants.length; j++) {
       const a = variants[i], b = variants[j];
+      // two styles rendered by one and the same component are its own variant or size props, not a near duplicate
+      const ca = Object.keys(a.components), cb = Object.keys(b.components);
+      if (ca.length === 1 && cb.length === 1 && ca[0] === cb[0]) continue;
       const differs = Object.keys(a.signature).filter((k) => a.signature[k] !== b.signature[k]);
       if (differs.length === 0 || !differs.every((k) => fieldNear(k, a.signature[k], b.signature[k]))) continue;
       out.push(a.id < b.id ? { a, b, differs } : { a: b, b: a, differs });

@@ -26,4 +26,19 @@
   <button id="w1" style="background:none;border:0;padding:0;display:block;width:400px;text-align:left"><h3>Clickable card</h3><p>row</p></button>
   <button id="w2" style="background:none;border:0;padding:8px 12px;display:block;width:1200px;text-align:left">Wide row</button>
   <button id="g1" style="background:none;border:0;padding:8px 12px;color:#3366ff">Ghost-ish</button>
+  <!-- form widgets built on <button> (Radix, Headless UI): not action buttons -->
+  <button role="checkbox" aria-checked="true" class="icon" id="x1"><span style="display:block;width:16px;height:16px;background:#333"></span></button>
+  <button role="switch" aria-checked="false" class="ghost" id="x2">Off</button>
+  <button role="combobox" aria-expanded="false" class="ghost" id="x3">Choose a fruit</button>
+  <button role="tab" class="btn" id="x4">Overview</button>
+  <!-- a clickable list row: unstyled, compact, but its text is a whole preview -->
+  <button id="r1" style="background:none;border:0;padding:8px;width:300px;text-align:left"><b>Alex John</b> You: See you later, Alex! Thanks for the review</button>
+  <!-- a chat row: unstyled, short text, but two lines with an avatar: a list row -->
+  <button id="r2" style="background:none;border:0;padding:8px;width:300px;text-align:left;display:flex;gap:8px"><span style="display:block;width:40px;height:40px;background:#ccc;border-radius:50%"></span><span><b>Alex John</b><br>See you later!</span></button>
+  <!-- a chart library injects a <style> into the element: not part of its text -->
+  <button class="btn" id="t1"><style>[data-chart=c1] { --color-a: red; }</style>Patient</button>
+  <!-- an alert box looks like a card but is a message -->
+  <div class="card" id="a1" role="alert"><h4>Heads up</h4><p>Something happened.</p></div>
+  <!-- a sidebar without nav/aside (shadcn): its items and its icon buttons are navigation -->
+  <div data-slot="sidebar"><button class="btn" id="s1">Dashboard</button><button class="icon" id="s2" aria-label="collapse"><span style="display:block;width:16px;height:16px;background:#333"></span></button></div>
 </body></html>

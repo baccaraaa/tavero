@@ -4,6 +4,8 @@ import { join, relative } from 'node:path';
 export type ComponentIndex = Map<string, Array<{ file: string; line: number }>>;
 
 const SKIP_DIRS = new Set(['node_modules', '.next', 'dist', 'build', '.git', 'out', 'public', '.tavero']);
+// a default-exported function is a component whatever its case: Next pages are often `export default function page()`
+const DEFAULT_FN = /^\s*export\s+default\s+(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*[<(]/;
 const FN_DECL = /^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?function\s+([A-Z][A-Za-z0-9_]*)\s*[<(]/;
 const CONST_DECL = /^\s*(?:export\s+)?const\s+([A-Z][A-Za-z0-9_]*)\s*(?::\s*[^=]+)?=\s*(?:React\.)?(?:memo|forwardRef)?\s*[<(]?\s*(?:async\s*)?(?:function\b|\([^)]*\)\s*(?::[^=]*)?=>|[A-Za-z_$][\w$]*\s*=>|\(\s*\{)/;
 
@@ -24,7 +26,7 @@ export async function buildComponentIndex(projectDir: string, srcRoots: string[]
       const rel = relative(projectDir, full).replace(/\\/g, '/');
       const lines = (await readFile(full, 'utf8')).split('\n');
       for (let i = 0; i < lines.length; i++) {
-        const m = lines[i].match(FN_DECL) ?? lines[i].match(CONST_DECL);
+        const m = lines[i].match(FN_DECL) ?? lines[i].match(CONST_DECL) ?? lines[i].match(DEFAULT_FN);
         if (!m) continue;
         const list = index.get(m[1]) ?? [];
         list.push({ file: rel, line: i + 1 });

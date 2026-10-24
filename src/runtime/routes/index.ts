@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import type { ProjectInfo, RouteEntry, RouteSource, RouteStatus } from '../../core/types.js';
 import { discoverNextRoutes } from './next.js';
 import { discoverReactRouterRoutes } from './reactRouter.js';
+import { discoverTanstackRoutes } from './tanstack.js';
 
 const ASSET_EXT = /\.(pdf|png|jpe?g|gif|svg|webp|ico|css|js|mjs|map|json|xml|txt|zip|mp4|webm|mp3|woff2?|ttf)$/i;
 
@@ -34,11 +35,14 @@ export function collapseDynamic(path: string): string {
 export class RouteQueue {
   private items: Array<{ path: string; depth: number; entry: RouteEntry }> = [];
   private patterns = new Set<string>();
+  private paths = new Set<string>();
   private cursor = 0;
   constructor(private cap = 60) {}
+  /** Crawled links are deduped by pattern (/items/1, /items/2); declared routes only by exact path (/401, /403). */
   add(path: string, source: RouteSource, depth: number): boolean {
     const pattern = collapseDynamic(path);
-    if (this.patterns.has(pattern) || this.items.length >= this.cap) return false;
+    if (this.paths.has(path) || (source === 'crawl' && this.patterns.has(pattern)) || this.items.length >= this.cap) return false;
+    this.paths.add(path);
     this.patterns.add(pattern);
     this.items.push({ path, depth, entry: { path, source, status: 'pending' } });
     return true;
@@ -78,14 +82,18 @@ export async function planRoutes(opts: { cliRoutes?: string[]; project: ProjectI
     for (const e of saved) if (e.status !== 'skipped') queue.add(e.path, 'routes.json', 0);
     return { queue, warnings };
   }
-  const found = opts.project.framework === 'next'
-    ? await discoverNextRoutes(opts.project.dir)
-    : await discoverReactRouterRoutes(opts.project.dir, opts.project.srcRoots);
-  const source: RouteSource = opts.project.framework === 'next' ? 'next' : 'react-router';
-  for (const r of found.routes) {
-    if (!queue.add(r, source, 0) && queue.full) { warnings.push(`route cap reached (${queue.size}); narrow with --routes`); break; }
+  const discovered: Array<{ source: RouteSource; routes: string[]; skipped: Array<{ path: string; reason: string }> }> = opts.project.framework === 'next'
+    ? [{ source: 'next', ...(await discoverNextRoutes(opts.project.dir)) }]
+    : [
+        { source: 'react-router', ...(await discoverReactRouterRoutes(opts.project.dir, opts.project.srcRoots)) },
+        { source: 'tanstack-router', ...(await discoverTanstackRoutes(opts.project.srcRoots)) },
+      ];
+  outer: for (const found of discovered) {
+    for (const r of found.routes) {
+      if (!queue.add(r, found.source, 0) && queue.full) { warnings.push(`route cap reached (${queue.size}); narrow with --routes`); break outer; }
+    }
+    for (const s of found.skipped) warnings.push(`skipped ${s.path}: ${s.reason}`);
   }
-  for (const s of found.skipped) warnings.push(`skipped ${s.path}: ${s.reason}`);
   if (queue.size === 0) { queue.add('/', 'crawl', 0); warnings.push('no routes discovered; starting from /'); }
   return { queue, warnings };
 }

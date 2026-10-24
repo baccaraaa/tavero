@@ -67,6 +67,14 @@ export async function readPages(scanDir: string): Promise<PageRecord[]> {
   return Promise.all(files.map(async (f) => JSON.parse(await readFile(join(dir, f), 'utf8')) as PageRecord));
 }
 
+/**
+ * The order viewports are crawled in: widest first, because the first pass discovers the routes and phone
+ * layouts hide the navigation behind a menu button. The scan's own viewport list keeps its order.
+ */
+export function crawlOrder(viewports: Viewport[]): Viewport[] {
+  return [...viewports].sort((a, b) => b.width - a.width);
+}
+
 export async function scan(opts: ScanOptions): Promise<ScanResult> {
   const log = opts.log ?? (() => {});
   const project = await detectProject(opts.projectDir);
@@ -108,8 +116,9 @@ export async function scan(opts: ScanOptions): Promise<ScanResult> {
   let cancelled = false;
 
   try {
-    for (let vi = 0; vi < viewports.length; vi++) {
-      const vp = viewports[vi];
+    const order = crawlOrder(viewports);
+    for (let vi = 0; vi < order.length; vi++) {
+      const vp = order[vi];
       const context = await newScanContext(browser, { viewport: vp, sessionPath, devOrigin: opts.url, apiOrigin: opts.apiOrigin ?? null });
       // the first viewport drives link discovery; later passes replay the final route list
       const replay = vi === 0 ? null : queue.entries().filter((e) => e.status !== 'failed').map((e) => ({ path: e.path, depth: 0 }));

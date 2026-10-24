@@ -20,9 +20,12 @@ const NOT_APP = /(^|\/)node_modules\/|^_next\/|^@vite\/|^@fs\/|^@id\/|react-refr
  * dev-server URLs and bare absolute paths.
  */
 export function classifySource(source: string, opts: { projectDir: string; baseUrl: string }): { path: string; app: boolean } {
-  const projectAbs = opts.projectDir.replace(/\\/g, '/').replace(/\/$/, '');
+  // Windows drive letters come in either case (Turbopack writes "c:/", the project is "C:/")
+  const drive = (s: string) => s.replace(/^([a-z]):\//, (_, d: string) => `${d.toUpperCase()}:/`);
+  const projectAbs = drive(opts.projectDir.replace(/\\/g, '/').replace(/\/$/, ''));
   let p = source.replace(/\\/g, '/');
   if (p.startsWith('file://')) p = p.slice(7).replace(/^\/([A-Za-z]:\/)/, '$1'); // keep "/home/x", turn "/C:/x" into "C:/x"
+  p = drive(p);
   const i = p.indexOf('[project]/');
   if (i >= 0) p = p.slice(i + 10);
   if (p.startsWith(projectAbs + '/')) p = p.slice(projectAbs.length + 1);

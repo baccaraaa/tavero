@@ -43,9 +43,24 @@ describe('derivePage', () => {
   });
   it('flags nested cards', () => {
     const page = derivePage({ route: '/', viewport: DEFAULT_VIEWPORTS[2], status: 'ok', docSize: [1440, 900], elements: [
-      el({ t: 'div', r: [0, 0, 500, 300], styles: cardStyles(), children: 2 }),
-      el({ t: 'div', r: [20, 20, 300, 150], styles: cardStyles('rgb(246, 247, 249)'), children: 2, parentBg: 'rgb(255, 255, 255)' }),
+      el({ t: 'div', r: [0, 0, 500, 300], styles: cardStyles(), children: 2, a: 'Page', al: 'src/Page.tsx:3:5' }),
+      el({ t: 'div', r: [20, 20, 300, 150], styles: cardStyles('rgb(246, 247, 249)'), children: 2, parentBg: 'rgb(255, 255, 255)', a: 'Page', al: 'src/Page.tsx:4:5' }),
     ], instances: [], crops: new Map(), links: [] });
     expect(page.samples.map((s) => s.nested)).toEqual([false, true]);
+  });
+  it('leaves out what no app component renders (devtools, injected widgets) and what sits outside the page', () => {
+    const btn = S({ 'background-color': 'rgb(25, 28, 36)', color: 'rgb(255, 255, 255)', 'padding-top': '4px', 'padding-right': '6px', 'padding-bottom': '4px', 'padding-left': '6px', height: '24px', display: 'inline-block' });
+    const page = derivePage({ route: '/', viewport: DEFAULT_VIEWPORTS[2], status: 'ok', docSize: [1440, 900], elements: [
+      // React rendered it, but only library components own it: a devtools toggle
+      el({ t: 'button', r: [1300, 860, 120, 24], styles: btn, text: 'TanStack Router' }),
+      // the app's skip link, moved above the page until it gets focus
+      el({ t: 'a', r: [176, -208, 140, 36], styles: btn, text: 'Skip to Main', a: 'SkipToMain', al: 'src/skip.tsx:3:5' }),
+      // a widget mounted by another framework or a script (TanStack's Solid devtools): no React fiber
+      el({ t: 'div', r: [1300, 860, 120, 24], styles: S({ 'background-color': 'rgb(255, 192, 203)' }), f: false, text: '' }),
+      // the page itself (body) is outside React: still counted
+      el({ t: 'body', r: [0, 0, 1440, 900], styles: S({ 'background-color': 'rgb(250, 250, 250)' }), f: false, text: '' }),
+    ], instances: [], crops: new Map(), links: [] });
+    expect(page.samples).toEqual([]);
+    expect(Object.keys(page.colors)).toEqual(['#fafafa']);
   });
 });

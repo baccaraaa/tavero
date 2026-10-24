@@ -1,6 +1,6 @@
 {
   "name": "tavero",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "mcpName": "io.github.baccaraaa/tavero",
   "description": "UI consistency auditor for React apps, built for AI coding agents",
   "keywords": [

@@ -22,4 +22,10 @@ describe('buildComponentIndex', () => {
     expect(collisions(index)).toEqual([{ name: 'Row', files: ['src/b/Card.tsx', 'src/b/Card2.tsx'] }]);
     p.cleanup();
   });
+  it('indexes default-exported functions whatever their case: Next pages are often "export default function page()"', async () => {
+    const p = makeTmpProject({ 'src/app/unauthorized/page.tsx': ['import Link from "next/link";', 'export default function page() {', '  return null;', '}', ''].join('\n') });
+    const index = await buildComponentIndex(p.dir, [`${p.dir}/src`]);
+    expect(index.get('page')).toEqual([{ file: 'src/app/unauthorized/page.tsx', line: 2 }]);
+    p.cleanup();
+  });
 });

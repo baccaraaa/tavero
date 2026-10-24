@@ -52,6 +52,12 @@ export function derivePage(input: {
   const roleOrdinal = new Map<Role, number>();
 
   for (const el of input.elements) {
+    // React rendered it but no app component owns it (devtools toggles, third-party widgets): nothing to fix in the app
+    if (el.f && !el.a) continue;
+    // outside React entirely: only the page itself counts; the rest was mounted by another framework or a script
+    if (!el.f && el.t !== 'body' && el.t !== 'html') continue;
+    // entirely above or left of the page, e.g. a skip link waiting for focus
+    if (el.r[1] + el.r[3] <= 0 || el.r[0] + el.r[2] <= 0) continue;
     const n: NormalizedStyles = normalizeStyles(el.styles);
     const inst = el.aid ? byKey.get(el.aid) : undefined;
     const ex: CountExample = { route, viewport: vp, component: el.a, file: el.al };

@@ -81,6 +81,15 @@
   }
 
   const sx = window.scrollX, sy = window.scrollY;
+  // visible text only: chart libraries inject <style> into elements, and textContent would include it
+  const textOf = (root) => {
+    let out = '';
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.parentElement && n.parentElement.closest('style, script, noscript, template') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    for (let n = walker.nextNode(); n && out.length < 200; n = walker.nextNode()) out += n.nodeValue;
+    return out.trim().slice(0, 60);
+  };
   const result = {
     url: location.href,
     viewport: [innerWidth, innerHeight],
@@ -140,7 +149,7 @@
     for (const p of opts.styleProps) styles[p] = cs.getPropertyValue(p);
     const parent = el.parentElement;
     const interactiveAncestor = parent ? parent.closest('button, a, input, select, textarea, [role="button"], [role="dialog"]') : null;
-    const navAncestor = parent ? parent.closest('nav, aside, [role="navigation"], [role="menu"], [role="menubar"], [role="tablist"], [role="listbox"]') : null;
+    const navAncestor = parent ? parent.closest('nav, aside, [role="navigation"], [role="menu"], [role="menubar"], [role="tablist"], [role="listbox"], [data-slot="sidebar"], [data-sidebar="sidebar"]') : null;
     result.elements.push({
       role: el.getAttribute('role'),
       type: el.getAttribute('type'),
@@ -153,7 +162,7 @@
       oc,
       si,
       r: [Math.round(r.x + sx), Math.round(r.y + sy), Math.round(r.width), Math.round(r.height)],
-      text: el.childElementCount <= 3 ? (el.textContent || '').trim().slice(0, 60) : '',
+      text: el.childElementCount <= 3 ? textOf(el) : '',
       styles,
       children: el.childElementCount,
       parentBg: parent ? getComputedStyle(parent).backgroundColor : null,

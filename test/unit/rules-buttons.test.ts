@@ -10,7 +10,7 @@ describe('buttonsRule', () => {
   it('reports variants with severity, near pairs and raw buttons', () => {
     const f = buttonsRule(input([
       S('s1', N()), S('s2', N()),
-      S('s3', N({ paddingX: 16 })),
+      S('s3', N({ paddingX: 16 }), { componentName: 'SaveButton', componentId: 'c_save', file: 'src/SaveButton.tsx' }),
       S('s4', N({ bg: '#ff0000' })),
       S('s5', N({ bg: '#10b981', radius: [999, 999, 999, 999] }), { componentName: 'PillButton', componentId: 'c_pill', file: 'src/Pill.tsx' }),
       S('s6', N({ bg: '#111111' }), { componentName: 'Home', componentId: 'c_home', file: 'src/Home.tsx', line: 12, text: 'Raw' }),
@@ -32,5 +32,24 @@ describe('buttonsRule', () => {
   it('is quiet when there is one style and no raw buttons', () => {
     const f = buttonsRule(input([S('s1', N()), S('s2', N())]));
     expect(f.map((x) => [x.key, x.severity])).toEqual([['variants:text', 'info']]);
+  });
+  it('rates many styles of one shared component (its variant and size props) medium, not high', () => {
+    const f = buttonsRule(input([
+      S('s1', N()), S('s2', N({ bg: '#ffffff', color: '#111111' })), S('s3', N({ bg: null })),
+      S('s4', N({ paddingX: 10 })), S('s5', N({ bg: '#ff0000' })),
+      S('s6', N({ bg: null, fontWeight: 400 }), { componentName: 'Chats', componentId: 'c_chats', file: 'src/Chats.tsx' }),
+    ]));
+    const v = f.find((x) => x.key === 'variants:text')!;
+    expect(v).toMatchObject({ severity: 'medium', stats: { variants: 6, components: 2 } });
+    expect(v.summary).toContain('Button');
+  });
+  it('looks for near pairs only between components: sizes of one component are its API', () => {
+    const f = buttonsRule(input([
+      S('s1', N()), S('s2', N({ paddingX: 12 })), // Button size sm vs default
+      S('s3', N({ radius: [8, 8, 8, 8] }), { componentName: 'MenuTrigger', componentId: 'c_menu', file: 'src/Menu.tsx' }),
+    ]));
+    const near = f.filter((x) => x.key.startsWith('near:'));
+    expect(near.length).toBeGreaterThan(0);
+    for (const x of near) expect(x.evidence.map((e) => e.component).sort()).toEqual(['Button', 'MenuTrigger']);
   });
 });

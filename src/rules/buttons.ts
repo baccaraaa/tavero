@@ -13,14 +13,21 @@ export function buttonsRule(input: RuleInput): Finding[] {
     if (!variants.length) continue;
     const samples = variants.reduce((n, v) => n + v.count, 0);
     const key = `variants:${ROLE_KEY[role]}`;
+    // styles outside the main button component are drift; many styles of that one component are its variant API,
+    // a design-system decision for a person (canonical + allowed in the panel), not urgent work for the agent
+    const stylesByComponent = new Map<string, number>();
+    for (const v of variants) for (const name of Object.keys(v.components)) stylesByComponent.set(name, (stylesByComponent.get(name) ?? 0) + 1);
+    const components = stylesByComponent.size;
+    const [topName, topStyles] = [...stylesByComponent.entries()].sort((a, b) => b[1] - a[1])[0] ?? ['', 0];
     out.push({
       id: findingId('buttons', key), rule: 'buttons', key,
-      severity: variants.length >= 5 ? 'high' : variants.length >= 2 ? 'medium' : 'info',
+      severity: variants.length >= 5 && variants.length - topStyles >= 2 ? 'high' : variants.length >= 2 ? 'medium' : 'info',
       title: `${variants.length} ${role === 'button-text' ? 'text button' : 'icon button'} style${variants.length === 1 ? '' : 's'}`,
       summary: variants.length === 1
         ? `All ${samples} ${role} samples share one style.`
-        : `${samples} ${role} samples fall into ${variants.length} distinct styles; the most common is used ${variants[0].count} time(s).`,
-      stats: { variants: variants.length, samples },
+        : `${samples} ${role} samples fall into ${variants.length} distinct styles from ${components} component(s); the most common is used ${variants[0].count} time(s)`
+          + (topStyles > 1 ? `; ${topStyles} of them come from ${topName}.` : '.'),
+      stats: { variants: variants.length, samples, components },
       evidence: variants.map((v) => variantEvidence(v, input.instances)),
     });
     for (const { a, b, differs } of nearVariants(variants)) {

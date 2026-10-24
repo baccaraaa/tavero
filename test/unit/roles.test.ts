@@ -39,6 +39,13 @@ describe('classifyRole', () => {
     expect(role('w1')).toBeNull(); // unstyled, zero padding: clickable wrapper
     expect(role('w2')).toBeNull(); // unstyled, wider than 60% of the viewport: list row
     expect(role('g1')).toBe('button-text'); // unstyled but compact and padded: a ghost button
+    for (const id of ['x1', 'x2', 'x3', 'x4']) expect(role(id), id).toBeNull(); // checkbox, switch, combobox, tab
+    expect(role('s1')).toBeNull(); // item of a data-slot="sidebar"
+    expect(role('s2')).toBeNull(); // icon button in the sidebar
+    expect(role('r1')).toBeNull(); // clickable list row with a long preview
+    expect(role('r2')).toBeNull(); // clickable list row: short text, but tall
+    expect(role('a1')).toBeNull(); // role="alert": a message, not a card
+    expect(byId.get('t1')!.text).toBe('Patient'); // the <style> inside is not text
     await page.close();
   });
 });
