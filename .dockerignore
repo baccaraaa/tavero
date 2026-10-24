@@ -1,0 +1,12 @@
+node_modules
+dist
+site
+demo
+test
+docs
+spike
+temp
+private
+public-repo
+.tavero
+.git
