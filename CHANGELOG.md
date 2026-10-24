@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1 — 2026-10-24
+
+- Listed in the official MCP Registry as `io.github.baccaraaa/tavero` (`mcpName` in `package.json`, `server.json`).
+
 ## 0.5.0 — 2026-10-23
 
 - `tavero ui --export <dir>`: a static, read-only copy of the panel for the latest scan (plain HTML, crops and fonts included).

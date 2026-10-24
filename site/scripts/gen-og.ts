@@ -1,6 +1,7 @@
 // The link preview image (Open Graph and Twitter, 1200×630), rendered with the site's own fonts from a built site
 // (npm run site:build first) and written to app/opengraph-image.png; lib/seo.ts names it as og:image and
 // twitter:image on every page. Run it again when the headline or the demo finding changes.
+// `--size 1280x640 --out <file>` renders another size, e.g. the GitHub social preview.
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
@@ -16,6 +17,10 @@ const srv = createServer(async (q, r) => {
   let p = join(OUT, decodeURIComponent(new URL(q.url ?? '/', 'http://x').pathname));
   try { if ((await stat(p)).isDirectory()) p = join(p, 'index.html'); r.setHeader('content-type', TYPES[extname(p)] ?? 'application/octet-stream'); r.end(await readFile(p)); } catch { r.statusCode = 404; r.end(); }
 }).listen(5196);
+
+const arg = (name: string) => { const i = process.argv.indexOf(name); return i > 0 ? process.argv[i + 1] : undefined; };
+const [W, H] = (arg('--size') ?? '1200x630').split('x').map(Number);
+const TARGET = arg('--out') ?? join(APP, 'opengraph-image.png');
 
 const finding = 'data:image/webp;base64,' + readFileSync(join(ROOT, 'docs', 'images', 'finding.webp')).toString('base64');
 const logo = readFileSync(join(APP, 'icon.svg'), 'utf8').replace('<svg ', '<svg width="44" height="44" ');
@@ -33,7 +38,7 @@ const card = `
 
 const browser = await chromium.launch();
 try {
-  const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
+  const page = await browser.newPage({ viewport: { width: W, height: H } });
   await page.goto('http://localhost:5196/', { waitUntil: 'networkidle' });
   // load the faces before the text exists, so font-display: optional cannot fall back
   await page.evaluate(async () => {
@@ -41,6 +46,6 @@ try {
   });
   await page.evaluate((html) => { document.body.innerHTML = html; }, card);
   await page.evaluate(async () => { await Promise.all([...document.images].map((i) => i.decode())); await document.fonts.ready; });
-  await page.screenshot({ path: join(APP, 'opengraph-image.png') });
+  await page.screenshot({ path: TARGET });
 } finally { await browser.close(); srv.close(); }
-console.log('app/opengraph-image.png');
+console.log(TARGET);

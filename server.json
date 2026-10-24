@@ -1,0 +1,34 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.baccaraaa/tavero",
+  "title": "Tavero",
+  "description": "Finds UI drift in React apps (buttons, cards, colors, spacing) and gives your agent each fix",
+  "websiteUrl": "https://taveroui.com",
+  "repository": {
+    "url": "https://github.com/baccaraaa/tavero",
+    "source": "github"
+  },
+  "icons": [
+    {
+      "src": "https://taveroui.com/icon.svg",
+      "mimeType": "image/svg+xml"
+    }
+  ],
+  "version": "0.5.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "tavero",
+      "version": "0.5.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp"
+        }
+      ]
+    }
+  ]
+}

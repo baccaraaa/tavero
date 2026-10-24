@@ -31,3 +31,4 @@ site/app/tokens.css
 site/next-env.d.ts
 site/tsconfig.tsbuildinfo
 site/.audit/
+.playwright-mcp/
