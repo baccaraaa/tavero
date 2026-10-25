@@ -65,7 +65,7 @@ export async function attributePage(raw: RawPage, resolver: Resolver, index: Com
       const hit = index.get(nm)?.[0] ?? null;
       app = { name: nm, key: `rsc:${nm}`, loc: hit ? `${hit.file}:${hit.line}` : null, hops: 0, via: 'rsc', file: hit?.file ?? null, line: hit?.line ?? null, resolved: 'static' };
     }
-    elements.push({ t: e.t, role: e.role, type: e.type, inInteractive: e.inInteractive, inNav: e.inNav, inOverlay: e.inOverlay, f: e.f, o: direct?.name ?? null, s: own ? fmt(own.r) : null, a: app?.name ?? null, al: app?.loc ?? null, ah: app?.hops ?? null, aid: app?.key ?? null, via: app?.via, si: e.si, r: e.r, styles: e.styles, children: e.children, parentBg: e.parentBg, text: e.text });
+    elements.push({ t: e.t, dk: e.dk, role: e.role, type: e.type, inInteractive: e.inInteractive, inNav: e.inNav, inOverlay: e.inOverlay, f: e.f, o: direct?.name ?? null, s: own ? fmt(own.r) : null, a: app?.name ?? null, al: app?.loc ?? null, ah: app?.hops ?? null, aid: app?.key ?? null, via: app?.via, si: e.si, r: e.r, styles: e.styles, children: e.children, parentBg: e.parentBg, text: e.text });
     if (!app?.name) continue;
     let inst = instances.get(app.key);
     if (!inst) {

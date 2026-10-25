@@ -102,7 +102,30 @@
     links: [...new Set(links)],
     hasPasswordInput,
     nextBuildError,
+    pageBg: pageBackground(),
   };
+  // the page background: body, else html, else white
+  function pageBackground() {
+    for (const node of [document.body, document.documentElement]) {
+      const bg = node ? getComputedStyle(node).backgroundColor : '';
+      if (bg && bg !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(bg)) return bg;
+    }
+    return 'rgb(255, 255, 255)';
+  }
+  // a stable key per element (child indexes from body), to match an element between the light and dark render
+  const keyCache = new Map();
+  const indexCache = new Map();
+  function domKey(el) {
+    if (el === document.body || !el.parentElement) return '';
+    const hit = keyCache.get(el);
+    if (hit !== undefined) return hit;
+    const parent = el.parentElement;
+    let idx = indexCache.get(parent);
+    if (!idx) { idx = new Map(); let i = 0; for (const c of parent.children) idx.set(c, i++); indexCache.set(parent, idx); }
+    const key = domKey(parent) + '.' + idx.get(el);
+    keyCache.set(el, key);
+    return key;
+  }
   const SKIP_TAGS = new Set(['script', 'style', 'noscript', 'link', 'meta', 'template', 'svg', 'path']);
   // overlay = any ancestor up to body that is fixed/sticky or a dialog (cookie banners, modals, sticky headers)
   const overlayCache = new Map();
@@ -157,6 +180,7 @@
       inNav: !!navAncestor,
       inOverlay: inOverlayOf(el),
       t: tag,
+      dk: domKey(el),
       f: !!f,
       sf: f ? parseStack(f._debugStack) : null,
       oc,

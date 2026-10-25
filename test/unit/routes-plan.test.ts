@@ -39,6 +39,16 @@ describe('route planning', () => {
     expect(q.add('/items/2', 'crawl', 1)).toBe(false);
     expect(q.add('/404', 'crawl', 1)).toBe(false);
   });
+  it('RouteQueue.next on an empty queue does not skip routes added later (parallel crawl)', () => {
+    const q = new RouteQueue(10);
+    q.add('/', 'crawl', 0);
+    expect(q.next()?.path).toBe('/');
+    expect(q.next()).toBeUndefined(); // an idle worker asks while '/' is still being crawled
+    expect(q.next()).toBeUndefined();
+    q.add('/projects', 'crawl', 1);
+    q.add('/billing', 'crawl', 1);
+    expect([q.next()?.path, q.next()?.path]).toEqual(['/projects', '/billing']);
+  });
   it('planRoutes prefers cli, then routes.json, then discovery', async () => {
     const p = makeTmpProject({
       'package.json': JSON.stringify({ dependencies: { next: '16' } }),

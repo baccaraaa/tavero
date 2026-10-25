@@ -27,7 +27,7 @@ a { color: var(--acme-primary); }
 .project-card .meta { color: var(--acme-muted); font-size: 13px; margin-bottom: 14px; }
 
 /* Billing: copied from the old marketing site */
-.plan-name { font-size: 17px; font-weight: 600; }
+.plan-name { font-size: 17px; font-weight: 600; color: #1d2433; }
 .plan-price { font-size: 15px; color: #667085; }
 .plan-note { font-size: 13px; color: #667085; }
 .upgrade { font: 600 14px/1 system-ui, sans-serif; padding: 11px 18px; border: 0; border-radius: 8px; background: #4263eb; color: #ffffff; cursor: pointer; }

@@ -41,7 +41,7 @@ export function buildReport(scan: Scan): string {
 <body>
 <h1>Tavero report</h1>
 <p class="muted">${esc(m.project.dir)} · ${esc(m.url)} · ${m.project.framework} · ${esc(m.createdAt)} · tavero ${esc(m.version)}</p>
-<p><span class="pill">${s.findings.high} high</span><span class="pill">${s.findings.medium} medium</span><span class="pill">${s.findings.info} info</span> ${n(s.pages, 'page')}, ${n(s.components, 'component')} (${s.unresolvedComponents} without file), ${n(s.instances, 'instance')}, ${n(s.tokens, 'token')}; viewports ${esc(viewports.join(', '))}; rules ${esc(m.rulesRun.join(', '))}</p>
+<p><span class="pill">${s.findings.high} high</span><span class="pill">${s.findings.medium} medium</span><span class="pill">${s.findings.info} info</span> ${n(s.pages, 'page')}, ${n(s.components, 'component')} (${s.unresolvedComponents} without file), ${n(s.instances, 'instance')}, ${n(s.tokens, 'token')}; viewports ${esc(viewports.join(', '))}${m.themes?.length ? `, plus ${esc(m.themes.join(', '))} theme at ${esc([...m.viewports].sort((a, b) => b.width - a.width)[0]?.name ?? 'desktop')} width` : ''}; rules ${esc(m.rulesRun.join(', '))}</p>
 ${stale}${warnings}
 <h2>Findings</h2>
 <table><tr><th>id</th><th>severity</th><th>rule</th><th>decision</th><th>title (open for evidence)</th><th>evidence</th></tr>

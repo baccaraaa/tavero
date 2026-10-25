@@ -15,13 +15,17 @@ Dev builds keep, for every element, the component that rendered it and where in 
 
 Run `tavero login` once and log in in the browser that opens. The session is saved in `.tavero/` and used for every scan. If a session expires, the scan reports the routes that landed on the login page.
 
+## Does it check the dark theme?
+
+Yes, when the project styles one. The scan adds a dark pass at desktop width and reports backgrounds that stay light, dark text left on a dark page, and colors only the dark theme uses that no token has. If your app keeps the theme somewhere Tavero does not set, the scan warns that the page did not get darker. Skip the pass with `--no-dark`. See [Rules](/docs/rules/).
+
 ## What does it write?
 
 Only `<project>/.tavero/`: scans, crops, the saved session and `decisions.json`. It never changes your code. Add `.tavero/` to `.gitignore` except `decisions.json`, which you can commit to share decisions.
 
 ## How fast is a rescan?
 
-A full scan of a few dozen routes at three widths takes minutes. A rescan of one route and one rule takes seconds, and findings from routes you did not rescan are carried over. After a partial rescan `diff` says which routes may still carry a finding; run a full scan to confirm.
+Tavero crawls three pages at once (`--concurrency` up to 8) and reads each page as soon as it stops changing. A full scan of about 30 routes at three widths, plus the dark pass, takes about two minutes. A rescan of one route and one rule takes seconds, and findings from routes you did not rescan are carried over. After a partial rescan `diff` says which routes may still carry a finding; run a full scan to confirm.
 
 ## Does it send my code anywhere?
 

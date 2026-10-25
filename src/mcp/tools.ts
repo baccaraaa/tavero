@@ -91,7 +91,7 @@ export const TOOLS: ToolDef[] = [
   },
   {
     name: 'tavero_scan', title: 'Scan the running app',
-    description: 'Crawl the app in a real browser at mobile/tablet/desktop widths, map every element to its React component and file:line, and recompute findings. A full scan takes minutes; after a code fix pass only the affected `routes` and the finding\'s `rules` (seconds) — findings on other routes are carried over. Needs the dev server url (it is started with `npm run dev` if nothing answers and kept running for later scans). Then call tavero_diff.',
+    description: 'Crawl the app in a real browser at mobile/tablet/desktop widths (plus one dark-theme pass at desktop width when the project styles a dark theme), map every element to its React component and file:line, and recompute findings. A full scan takes minutes; after a code fix pass only the affected `routes` and the finding\'s `rules` (seconds) — findings on other routes are carried over. Needs the dev server url (it is started with `npm run dev` if nothing answers and kept running for later scans). Then call tavero_diff.',
     input: {
       url: z.string().url().describe('dev server url, e.g. http://localhost:5173'),
       routes: z.array(z.string().startsWith('/')).min(1).optional().describe('only these routes; omit for all routes'),

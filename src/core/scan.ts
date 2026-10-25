@@ -12,6 +12,8 @@ import { componentId } from './ids.js';
 import { detectProject } from '../project/detect.js';
 import { buildComponentIndex } from '../static/componentIndex.js';
 import { findTokenDeclarations } from '../static/tokens.js';
+import { detectDarkTheme } from '../static/darkTheme.js';
+import { darkThemeRule } from '../rules/dark.js';
 import { planRoutes, writeRoutesFile, readRoutesFile } from '../runtime/routes/index.js';
 import { attachOrLaunch } from '../runtime/server.js';
 import { loadSessionPath } from '../runtime/session.js';
@@ -39,6 +41,10 @@ export interface ScanOptions {
   log?: (line: string) => void;
   /** checked between pages; a cancelled scan removes its directory and leaves `latest` untouched */
   signal?: AbortSignal;
+  /** pages crawled at once (default 3) */
+  concurrency?: number;
+  /** scan the dark theme too: true, false, or undefined to decide from the project's CSS */
+  dark?: boolean;
   /** called after every crawled page; `total` is known only for explicit routes */
   onPage?: (p: { done: number; total: number | null; line: string }) => void;
   /** leave a dev server this scan launched running; the caller stops it through `result.devServer` */
@@ -105,28 +111,35 @@ export async function scan(opts: ScanOptions): Promise<ScanResult> {
   if (!opts.viewports && opts.routes?.length && previous) {
     try { viewports = (JSON.parse(await readFile(join(previous, 'scan.json'), 'utf8')) as ScanMeta).viewports; } catch { /* keep defaults */ }
   }
+  const darkFound = opts.dark === false ? { has: false, how: [] as string[] } : await detectDarkTheme(project.cssEntries, project.tailwindConfig);
+  const darkOn = opts.dark === true || darkFound.has;
+  if (darkOn) log(`dark theme: ${darkFound.how.join(', ') || 'requested'}; adding a dark pass at desktop width`);
+  const widest = crawlOrder(viewports)[0];
+  // the dark pass: the widest width, once the light passes have settled the route list
+  const darkViewport: Viewport | null = darkOn ? { name: 'dark', width: widest.width, height: widest.height, theme: 'dark' } : null;
   const resolver = createResolver({ kind: project.framework, baseUrl: new URL(opts.url).origin, projectDir: project.dir });
   const browser = await chromium.launch();
   const budget = new Map<string, number>();
   const variantSeen = new Set<string>();
   const crawled: PageRecord[] = [];
   let tokensTaken = false;
-  const total = opts.routes?.length ? opts.routes.length * viewports.length : null;
+  const total = opts.routes?.length ? opts.routes.length * (viewports.length + (darkOn ? 1 : 0)) : null;
   let done = 0;
   let cancelled = false;
 
   try {
-    const order = crawlOrder(viewports);
+    const concurrency = Math.max(1, Math.min(8, opts.concurrency ?? 3));
+    const order = [...crawlOrder(viewports), ...(darkViewport ? [darkViewport] : [])];
     for (let vi = 0; vi < order.length; vi++) {
       const vp = order[vi];
       const context = await newScanContext(browser, { viewport: vp, sessionPath, devOrigin: opts.url, apiOrigin: opts.apiOrigin ?? null });
       // the first viewport drives link discovery; later passes replay the final route list
       const replay = vi === 0 ? null : queue.entries().filter((e) => e.status !== 'failed').map((e) => ({ path: e.path, depth: 0 }));
       let cursor = 0;
-      for (;;) {
-        if (opts.signal?.aborted) throw new TaveroError('cancelled', 'scan cancelled', 130);
-        const item = replay ? replay[cursor++] : queue.next();
-        if (!item) break;
+      let inFlight = 0;
+      const waiting: Array<() => void> = [];
+      const nextItem = () => (replay ? replay[cursor++] : queue.next());
+      const processItem = async (item: { path: string; depth: number }) => {
         const res = await crawlRoute({ context, baseUrl: opts.url, route: item.path, viewport: vp, shotsDir, resolver, index });
         const distinct = new Set([...res.instances.values()].map((i) => i.name)).size;
         const line = `${vp.name.padEnd(7)} ${item.path.padEnd(40)} ${res.status}${res.reason ? ' ' + res.reason : ''}  components=${distinct}`;
@@ -148,17 +161,21 @@ export async function scan(opts: ScanOptions): Promise<ScanResult> {
           for (const inst of res.instances.values()) counts.set(inst.name, (counts.get(inst.name) ?? 0) + 1);
           const top = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([n]) => n);
           const list = [...res.instances.values()].map((instance) => ({ instance, componentId: componentId(instance.file, instance.name) }));
-          const crops = res.page
+          const crops = res.page && !vp.theme
             ? await cropInstances({ page: res.page, instances: list, docSize: res.raw.docSize, viewport: vp, cropsDir, route: item.path, perComponentBudget: budget, limit: 12, maxAreaRatio: 0.6, select: new Set([...(opts.crop ?? []), ...top]) })
             : new Map<string, string>();
-          const takeTokens = !tokensTaken && res.raw.tokens.length > 0;
+          const takeTokens = !vp.theme && !tokensTaken && res.raw.tokens.length > 0;
           if (takeTokens) tokensTaken = true;
           record = derivePage({
             route: item.path, viewport: vp, status: res.status, reason: res.reason, docSize: res.raw.docSize,
             elements: res.elements, instances: [...res.instances.values()], crops, links: res.links,
             tokens: takeTokens ? { decls: res.raw.tokens, values: res.raw.tokenValues } : undefined,
+            pageBg: res.raw.pageBg,
+            // element colors for the light/dark comparison: the widest light width and the dark pass
+            probe: darkOn && (vp === widest || vp.theme === 'dark'),
+            darkTokens: vp.theme === 'dark' ? res.raw.tokenValues : undefined,
           });
-          if (res.page) await cropVariantSamples({ page: res.page, samples: record.samples, docSize: res.raw.docSize, viewport: vp, cropsDir, seen: variantSeen, maxAreaRatio: 0.6 });
+          if (res.page && !vp.theme) await cropVariantSamples({ page: res.page, samples: record.samples, docSize: res.raw.docSize, viewport: vp, cropsDir, seen: variantSeen, maxAreaRatio: 0.6 });
           if (opts.keepRaw) {
             await mkdir(join(scanDir, 'raw'), { recursive: true });
             await writeFile(join(scanDir, 'raw', pageFileName(vp.name, item.path)), JSON.stringify(res.raw));
@@ -169,8 +186,29 @@ export async function scan(opts: ScanOptions): Promise<ScanResult> {
         await writeFile(join(pagesDir, pageFileName(vp.name, item.path)), JSON.stringify(record));
         crawled.push(record);
         await res.page?.close();
-      }
+      };
+      // a pool of pages: a worker with nothing to take while others are still crawling waits for them, since
+      // during discovery a finished page can add routes to the queue
+      const worker = async () => {
+        for (;;) {
+          if (opts.signal?.aborted) throw new TaveroError('cancelled', 'scan cancelled', 130);
+          const item = nextItem();
+          if (!item) {
+            if (inFlight === 0) return;
+            await new Promise<void>((r) => waiting.push(r));
+            continue;
+          }
+          inFlight++;
+          try { await processItem(item); } finally {
+            inFlight--;
+            for (const w of waiting.splice(0)) w();
+          }
+        }
+      };
+      const results = await Promise.allSettled(Array.from({ length: concurrency }, worker));
+      const failure = results.find((r): r is PromiseRejectedResult => r.status === 'rejected');
       await context.close();
+      if (failure) throw failure.reason;
     }
   } catch (e) {
     cancelled = (e as { code?: string }).code === 'cancelled';
@@ -187,7 +225,7 @@ export async function scan(opts: ScanOptions): Promise<ScanResult> {
   let routesForMeta: RouteEntry[] = queue.entries();
   if (opts.routes?.length && previous) {
     const prevPages = await readPages(previous);
-    const vpNames = new Set(viewports.map((v) => v.name));
+    const vpNames = new Set([...viewports.map((v) => v.name), ...(darkViewport ? [darkViewport.name] : [])]);
     for (const p of prevPages) {
       if (!vpNames.has(p.viewport) || rescanned.has(`${p.viewport}|${p.route}`)) continue;
       await copyFile(join(previous, 'pages', pageFileName(p.viewport, p.route)), join(pagesDir, pageFileName(p.viewport, p.route)));
@@ -197,7 +235,9 @@ export async function scan(opts: ScanOptions): Promise<ScanResult> {
     const known = new Set(routesForMeta.map((r) => r.path));
     routesForMeta = [...routesForMeta, ...prevRoutes.filter((r) => !known.has(r.path) && staleRoutes.has(r.path))];
   }
-  const pages = await readPages(scanDir);
+  const allPages = await readPages(scanDir);
+  // buttons, cards, scales and the light colors come from the light theme; the dark pass has its own rule
+  const pages = allPages.filter((p) => !p.theme);
   const agg = aggregate(pages, { declMap });
   const okPages = pages.filter((p) => p.status !== 'failed').length;
 
@@ -206,6 +246,11 @@ export async function scan(opts: ScanOptions): Promise<ScanResult> {
   if (opts.rules?.length && requested.length !== opts.rules.length) warnings.push(`unknown rules ignored: ${opts.rules.filter((r) => !(RULE_NAMES as string[]).includes(r)).join(', ')}`);
   const ruleInput: RuleInput = { samples: agg.samples, colors: agg.colors, scales: agg.scales, tokens: agg.tokens, staticInfo, instances: agg.instances, components: agg.components };
   let findings = runRules(ruleInput, requested.length ? requested : undefined);
+  if (darkOn && (!requested.length || requested.includes('colors'))) {
+    const dark = darkThemeRule(allPages, agg.tokens);
+    findings = sortFindings([...findings, ...dark.findings]);
+    if (dark.notApplied.length) warnings.push(`the dark theme did not switch on for ${dark.notApplied.length} route(s) (${dark.notApplied.slice(0, 3).join(', ')}${dark.notApplied.length > 3 ? ', …' : ''}); Tavero sets the system color scheme, the dark class and data-theme="dark"`);
+  }
   if (requested.length && previous) {
     try {
       const prev = JSON.parse(await readFile(join(previous, 'findings.json'), 'utf8')) as Finding[];
@@ -221,6 +266,7 @@ export async function scan(opts: ScanOptions): Promise<ScanResult> {
     url: opts.url,
     project: { dir: project.dir, framework: project.framework },
     viewports,
+    ...(darkOn ? { themes: ['dark'] } : {}),
     routes: routesForMeta,
     stats: { pages: okPages, components: agg.components.length, instances: agg.instances.length, tokens: agg.tokens.length, unresolvedComponents: agg.components.filter((c) => !c.file).length, findings: findingCounts },
     warnings,

@@ -10,7 +10,10 @@ export interface ProjectInfo {
   packageJson: Record<string, unknown>;
 }
 
-export interface Viewport { name: string; width: number; height: number }
+export interface Viewport { name: string; width: number; height: number; theme?: 'dark' }
+
+/** One element's colors, keyed by its DOM path, for comparing the light and the dark render of a page. */
+export interface ThemeProbe { k: string; bg: string | null; fg: string | null; pbg: string | null; a: number; c: string | null; f: string | null }
 export const DEFAULT_VIEWPORTS: Viewport[] = [
   { name: 'mobile', width: 375, height: 812 },
   { name: 'tablet', width: 768, height: 1024 },
@@ -46,6 +49,8 @@ export interface ScanMeta {
   url: string;
   project: { dir: string; framework: Framework };
   viewports: Viewport[];
+  /** extra theme passes, e.g. ['dark'] */
+  themes?: string[];
   routes: RouteEntry[];
   stats: { pages: number; components: number; instances: number; tokens: number; unresolvedComponents: number; findings: { high: number; medium: number; info: number } };
   warnings: string[];
@@ -138,6 +143,14 @@ export interface PageRecord {
   colors: ColorCounts;
   scales: ScaleCounts;
   tokens?: { decls: RawTokenDecl[]; values: Record<string, string> };
+  /** set on the dark-theme pass */
+  theme?: 'dark';
+  /** the page background (body, else html) */
+  pageBg?: string | null;
+  /** element colors for the light/dark comparison: on the widest light pass and the dark pass */
+  probe?: ThemeProbe[];
+  /** token values as the dark theme computes them */
+  darkTokens?: Record<string, string>;
 }
 
 // ---- rules and findings ----
@@ -186,6 +199,8 @@ export interface RawFrame { fn: string | null; loc: string }
 export interface RawOwner { name: string | null; frames: RawFrame[] | null; props: string[] }
 export interface RawElement {
   t: string;
+  /** DOM path key, see ThemeProbe */
+  dk?: string;
   role: string | null;
   type: string | null;
   inInteractive: boolean;
@@ -214,12 +229,14 @@ export interface RawPage {
   links: string[];
   hasPasswordInput: boolean;
   nextBuildError: string | null;
+  pageBg?: string;
 }
 
 // ---- attribution output ----
 export interface ResolvedLoc { raw: string; path: string | null; line: number | null; col: number | null; app: boolean }
 export interface AttributedElement {
   t: string;
+  dk?: string;
   role: string | null;
   type: string | null;
   inInteractive: boolean;

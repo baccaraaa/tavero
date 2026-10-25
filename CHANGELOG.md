@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0 — 2026-10-25
+
+- Dark theme. When the project styles one (a `.dark` class, `data-theme="dark"`, `prefers-color-scheme: dark`, Tailwind's dark variant), the scan adds one dark pass at desktop width and compares every element with its light render: backgrounds that stay light, dark text left on a dark page, and colors only the dark theme uses that no token has. Findings carry the theme token with both values as `expected`, e.g. `--card (light #ffffff, dark #171717)`. The theme is switched on through the browser's dark color scheme, the `dark` class, `data-theme` and the usual localStorage keys; if the page does not get darker, the scan warns instead of reporting. `--no-dark` skips the pass.
+- Faster scans: three pages are crawled at once (`--concurrency 1-8`), and each page is read once the DOM has been quiet for 300 ms and no short app timer or animation is pending, instead of after a fixed 1.5 s pause. shadcn-admin (28 routes) went from 273 s to 109 s with the dark pass included and the same light findings.
+
 ## 0.6.0 — 2026-10-24
 
 Found by running Tavero on open-source React dashboards (satnaing/shadcn-admin, arhamkhnz/next-shadcn-admin-dashboard).

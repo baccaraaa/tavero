@@ -1,7 +1,7 @@
-import type { AttributedElement, AttributedInstance, ColorCounts, CountEntry, CountExample, NormalizedStyles, PageInstance, PageRecord, RawTokenDecl, Role, RouteStatus, ScaleCounts, StyleSample, Viewport } from '../types.js';
+import type { ThemeProbe, AttributedElement, AttributedInstance, ColorCounts, CountEntry, CountExample, NormalizedStyles, PageInstance, PageRecord, RawTokenDecl, Role, RouteStatus, ScaleCounts, StyleSample, Viewport } from '../types.js';
 import { SCALE_PROPS } from '../types.js';
 import { componentId, hashId, instanceId } from '../ids.js';
-import { normalizeStyles } from '../../rules/normalize.js';
+import { normalizeStyles, hex } from '../../rules/normalize.js';
 import { classifyRole } from '../../rules/roles.js';
 
 const MAX_EXAMPLES = 5;
@@ -34,6 +34,12 @@ export function derivePage(input: {
   route: string; viewport: Viewport; status: RouteStatus; reason?: string; docSize: [number, number];
   elements: AttributedElement[]; instances: AttributedInstance[]; crops: Map<string, string>; links: string[];
   tokens?: { decls: RawTokenDecl[]; values: Record<string, string> };
+  /** the page background as computed (body, else html) */
+  pageBg?: string;
+  /** record element colors for the light/dark comparison */
+  probe?: boolean;
+  /** token values in the dark theme (dark pass only) */
+  darkTokens?: Record<string, string>;
 }): PageRecord {
   const { route, viewport } = input;
   const vp = viewport.name;
@@ -50,6 +56,8 @@ export function derivePage(input: {
   const colors: ColorCounts = {};
   const scales = emptyScales();
   const roleOrdinal = new Map<Role, number>();
+  const probe: ThemeProbe[] = [];
+  const PROBE_MAX = 4000;
 
   for (const el of input.elements) {
     // React rendered it but no app component owns it (devtools toggles, third-party widgets): nothing to fix in the app
@@ -75,6 +83,11 @@ export function derivePage(input: {
       bump(scales.typography, `${n.fontSize}/${n.fontWeight}/${n.lineHeight ?? 'n'}`, ex);
     }
     if (n.shadow !== 'none') bump(scales.shadow, n.shadow, ex);
+    // colors to compare with the other theme: backgrounds of a visible size, and text
+    const area = el.r[2] * el.r[3];
+    if (input.probe && el.dk !== undefined && probe.length < PROBE_MAX && ((n.bg && area >= 400) || (isText && n.color))) {
+      probe.push({ k: el.dk, bg: n.bg && area >= 400 ? n.bg : null, fg: isText ? n.color : null, pbg: hex(el.parentBg), a: area, c: el.a, f: el.al });
+    }
 
     const role = classifyRole(el, n, viewport);
     if (!role) continue;
@@ -95,5 +108,11 @@ export function derivePage(input: {
   const cards = samples.filter((s) => s.role === 'card');
   for (const c of cards) c.nested = cards.some((o) => o !== c && inside(c.rect, o.rect));
 
-  return { route, viewport: vp, status: input.status, reason: input.reason, docSize: input.docSize, crawledAt: new Date().toISOString(), links: input.links, instances, samples, colors, scales, tokens: input.tokens };
+  return {
+    route, viewport: vp, status: input.status, reason: input.reason, docSize: input.docSize, crawledAt: new Date().toISOString(), links: input.links, instances, samples, colors, scales, tokens: input.tokens,
+    ...(viewport.theme ? { theme: viewport.theme } : {}),
+    ...(input.pageBg !== undefined ? { pageBg: hex(input.pageBg) } : {}),
+    ...(input.probe ? { probe } : {}),
+    ...(input.darkTokens ? { darkTokens: input.darkTokens } : {}),
+  };
 }

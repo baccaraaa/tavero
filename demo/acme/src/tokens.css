@@ -12,3 +12,15 @@
   --acme-radius-sm: 6px;
   --acme-space: 16px;
 }
+
+/* the dark theme: the same tokens, switched by the dark class on <html> */
+.dark {
+  --acme-ink: #e6e9ef;
+  --acme-muted: #9aa3b2;
+  --acme-line: #2a3140;
+  --acme-surface: #171b24;
+  --acme-bg: #0f1218;
+  --acme-primary: #5c7cfa;
+  --acme-primary-ink: #ffffff;
+  --acme-danger: #ff6b6b;
+}

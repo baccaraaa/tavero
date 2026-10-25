@@ -63,4 +63,19 @@ describe('derivePage', () => {
     expect(page.samples).toEqual([]);
     expect(Object.keys(page.colors)).toEqual(['#fafafa']);
   });
+  it('records element colors by DOM key for the light/dark comparison when asked', () => {
+    const elements = [
+      el({ t: 'div', dk: '.0.1', r: [0, 0, 300, 200], styles: S({ 'background-color': 'rgb(255, 255, 255)' }), a: 'Card', al: 'src/Card.tsx:3:5', children: 2 }),
+      el({ t: 'p', dk: '.0.1.0', r: [10, 10, 100, 20], text: 'Hello', styles: S({ color: 'rgb(17, 17, 17)' }), parentBg: 'rgba(0, 0, 0, 0)', a: 'Card', al: 'src/Card.tsx:4:5' }),
+      el({ t: 'span', dk: '.0.2', r: [0, 0, 10, 10], styles: S({ 'background-color': 'rgb(255, 0, 0)' }), a: 'Dot', al: 'src/Dot.tsx:1:1' }), // too small to matter
+    ];
+    const withProbe = derivePage({ route: '/', viewport: { name: 'dark', width: 1440, height: 900, theme: 'dark' }, status: 'ok', docSize: [1440, 900], elements, instances: [], crops: new Map(), links: [], pageBg: 'rgb(10, 10, 10)', probe: true, darkTokens: { '--card': '#171717' } });
+    expect(withProbe).toMatchObject({ theme: 'dark', pageBg: '#0a0a0a', darkTokens: { '--card': '#171717' } });
+    expect(withProbe.probe).toEqual([
+      { k: '.0.1', bg: '#ffffff', fg: null, pbg: '#f6f7f9', a: 60000, c: 'Card', f: 'src/Card.tsx:3:5' },
+      { k: '.0.1.0', bg: null, fg: '#111111', pbg: null, a: 2000, c: 'Card', f: 'src/Card.tsx:4:5' },
+    ]);
+    const plain = derivePage({ route: '/', viewport: DEFAULT_VIEWPORTS[2], status: 'ok', docSize: [1440, 900], elements, instances: [], crops: new Map(), links: [] });
+    expect(plain.probe).toBeUndefined();
+  });
 });

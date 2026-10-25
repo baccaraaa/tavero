@@ -48,8 +48,11 @@ export class RouteQueue {
     return true;
   }
   next(): { path: string; depth: number } | undefined {
-    const it = this.items[this.cursor++];
-    return it ? { path: it.path, depth: it.depth } : undefined;
+    // advance only when there is an item: during a parallel crawl an idle worker asks before routes are added
+    const it = this.items[this.cursor];
+    if (!it) return undefined;
+    this.cursor++;
+    return { path: it.path, depth: it.depth };
   }
   entries(): RouteEntry[] { return this.items.map((i) => i.entry); }
   setStatus(path: string, status: RouteStatus, reason?: string): void {

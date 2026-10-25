@@ -25,5 +25,14 @@ describe('Acme demo app', () => {
     const ctx = readFileSync(join(res.dir, 'context.md'), 'utf8');
     expect(ctx).toContain('Action button is Button from src/components/Button.tsx');
     expect(ctx).toContain('Card is Card from src/components/Card.tsx');
+    // the dark theme: the project cards keep their literal white, the plan name its literal dark text
+    expect(res.meta.themes).toEqual(['dark']);
+    expect(res.warnings.join(' ')).not.toContain('did not switch on');
+    const lightBg = key('colors', 'dark:light-bg')!;
+    expect(lightBg.evidence.some((e) => e.value.startsWith('background #ffffff in both themes') && e.file === 'src/pages/Projects.tsx')).toBe(true);
+    const darkText = key('colors', 'dark:dark-text')!;
+    expect(darkText.evidence.some((e) => e.value.startsWith('text #1d2433') && e.file === 'src/pages/Billing.tsx')).toBe(true);
+    // tokens switch with the theme: the sidebar and the cards built on --acme-surface are not reported
+    expect(lightBg.evidence.some((e) => e.component === 'Sidebar' || e.component === 'Card')).toBe(false);
   });
 });

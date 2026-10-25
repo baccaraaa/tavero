@@ -26,7 +26,7 @@ Tavero scans your running React app, finds drift in buttons, cards, colors and s
 
 ## How it works
 
-1. **Scan.** Tavero opens your dev server in Chromium at mobile, tablet and desktop widths, with your login if the app needs one.
+1. **Scan.** Tavero opens your dev server in Chromium at mobile, tablet and desktop widths, with your login if the app needs one. If the project styles a dark theme, it adds one dark pass.
 2. **Attribute.** Every visible element is mapped to the React component and the source line that rendered it, from React's own dev-mode data. Nothing is added to your project.
 3. **Find.** Four rules compare what renders with your tokens and with itself: buttons, cards, colors and scales.
 4. **Fix.** Each finding is a task: what, where (file:line), the current value, and the token or component expected. Your agent fixes it, rescans one route in seconds, and checks that the finding is resolved.
@@ -108,7 +108,7 @@ A recorded run of Claude Code on the Acme demo, with no shell, 29 seconds:
 |---|---|
 | `buttons` | distinct text and icon button styles with the components that render them, near-duplicate pairs, `<button>`s written outside button components |
 | `cards` *(preliminary)* | distinct card styles, near pairs, card-like containers built inline |
-| `colors` | colors outside your tokens with the nearest token and ΔE, Tailwind default colors in a project with its own palette, near-identical pairs, hardcoded literals with file and line |
+| `colors` | colors outside your tokens with the nearest token and ΔE, Tailwind default colors in a project with its own palette, near-identical pairs, hardcoded literals with file and line; in a dark theme, backgrounds that stay light, dark text on a dark page and dark-only colors without a token |
 | `scales` | radius, padding, gap, font size, weight and shadow values off the scale your tokens declare |
 
 ## Decide what is intended

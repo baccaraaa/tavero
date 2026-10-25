@@ -54,7 +54,7 @@ tavero components | tavero component Button | tavero show Button --viewport mobi
 tavero report                                      # HTML report in the scan directory for the human
 ```
 
-Rules: `buttons` (distinct button styles, near pairs, raw `<button>`s), `cards` (preliminary), `colors` (off-palette, Tailwind defaults, near pairs, hardcoded literals), `scales` (radius/padding/gap/font/shadow off the declared scale).
+Rules: `buttons` (distinct button styles, near pairs, raw `<button>`s), `cards` (preliminary), `colors` (off-palette, Tailwind defaults, near pairs, hardcoded literals; in a dark theme, `dark:*` findings for backgrounds and text that do not switch), `scales` (radius/padding/gap/font/shadow off the declared scale).
 
 ## Fix loop
 

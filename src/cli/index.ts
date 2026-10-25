@@ -51,13 +51,17 @@ program
   .option('--api-origin <url>', 'allow requests to this backend origin (default: any localhost)')
   .option('--keep-raw', 'keep per-page raw JSON', false)
   .option('--rules <list>', 'comma-separated rules to (re)compute: buttons,cards,colors,scales')
+  .option('--concurrency <n>', 'pages crawled at once (1-8)', '3')
+  .option('--no-dark', 'skip the dark-theme pass (it runs when the project styles a dark theme)')
   .action(async (dir: string | undefined, o) => {
     const G = g();
     const projectDir = dir ? resolve(dir) : G.dir;
+    const concurrency = Number(o.concurrency);
+    if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 8) throw new TaveroError('bad-args', `--concurrency must be 1-8, got "${o.concurrency}"`, 2);
     const names = list(o.viewports) ?? [];
     const viewports = DEFAULT_VIEWPORTS.filter((v) => names.includes(v.name));
     if (!viewports.length) throw new TaveroError('bad-args', `unknown viewports "${o.viewports}"; known: ${DEFAULT_VIEWPORTS.map((v) => v.name).join(', ')}`, 2);
-    const res = await scan({ projectDir, url: o.url, routes: list(o.routes), viewports, out: G.out, crop: list(o.crop), apiOrigin: o.apiOrigin ?? null, keepRaw: o.keepRaw, rules: list(o.rules), log: (l) => { if (!G.json) console.log(l); } });
+    const res = await scan({ projectDir, url: o.url, routes: list(o.routes), viewports, out: G.out, crop: list(o.crop), apiOrigin: o.apiOrigin ?? null, keepRaw: o.keepRaw, rules: list(o.rules), concurrency, dark: o.dark === false ? false : undefined, log: (l) => { if (!G.json) console.log(l); } });
     const s = res.meta.stats;
     const v = scanView(res);
     emit(G, v, () => [

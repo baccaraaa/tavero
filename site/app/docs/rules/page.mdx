@@ -5,6 +5,8 @@ export const metadata = docMeta('rules');
 
 Four rules run on what the browser renders at mobile, tablet and desktop widths. Each finding has a stable id, a severity (high, medium or info), the components and source lines involved, and an `expected` value when there is one. Rescan a single rule with `--rules`.
 
+When the project styles a dark theme (a `.dark` class, `data-theme="dark"`, a `prefers-color-scheme: dark` query or Tailwind's dark variant), the scan adds one dark pass at desktop width. Tavero turns the theme on the way most apps do: the browser's dark color scheme, the `dark` class, `data-theme` and the usual localStorage theme keys. Turn the pass off with `--no-dark`.
+
 ## Buttons
 
 Distinct text-button and icon-button styles, with the components that render each one. A style is its background, text color, border, radius, padding, font size and weight, and shadow. The rule also reports pairs of styles that differ in only a value or two, and `<button>` elements written in page markup instead of a button component.
@@ -24,6 +26,14 @@ Card-like containers that differ in background, border, radius, padding or shado
 - Browser defaults, such as the black text of an unstyled `<button>`, are reported as info.
 
 When a color matches a family of tokens, the suggestion names the family.
+
+In the dark theme, each element is compared with the same element in the light render:
+
+- Backgrounds that stay light in both themes, usually a hardcoded color or a missing `dark:` variant. The `expected` value names the token with its light and dark values.
+- Text that keeps the same dark color on a dark background.
+- Colors that only the dark theme uses and no token has in either theme.
+
+If the page did not get darker, the scan warns and reports nothing for that route. Buttons, cards and scales are checked on the light theme only.
 
 ## Scales
 
