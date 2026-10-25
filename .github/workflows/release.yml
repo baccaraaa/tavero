@@ -6,6 +6,8 @@ name: Release
 on:
   push:
     tags: ['v*']
+  # a manual run publishes the version in package.json from the chosen branch
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -23,18 +25,19 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
-      # Trusted Publishing needs npm 11.5.1 or later
-      - run: npm install -g npm@latest
-      - name: Tag matches package.json and server.json
+      - name: package.json, server.json and the tag agree on the version
         run: |
           v="v$(node -p "require('./package.json').version")"
           s="v$(node -p "require('./server.json').version")"
-          test "$v" = "$GITHUB_REF_NAME" && test "$s" = "$GITHUB_REF_NAME"
+          test "$v" = "$s"
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then test "$v" = "$GITHUB_REF_NAME"; fi
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npx vitest run test/unit
+      # Trusted Publishing needs npm 11.5.1 or later; upgraded only here, the tests run on the npm that ships with Node
+      - run: npm install -g npm@latest
       - run: npm publish --access public --provenance
       - name: Update the MCP Registry
         run: |
