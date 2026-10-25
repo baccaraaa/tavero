@@ -1,0 +1,41 @@
+name: Release
+
+# A version tag (v0.6.0) publishes that version to npm through Trusted Publishing (no token: npm trusts this
+# workflow in baccaraaa/tavero via GitHub's OIDC) and updates the entry in the official MCP Registry.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      # Trusted Publishing needs npm 11.5.1 or later
+      - run: npm install -g npm@latest
+      - name: Tag matches package.json and server.json
+        run: |
+          v="v$(node -p "require('./package.json').version")"
+          s="v$(node -p "require('./server.json').version")"
+          test "$v" = "$GITHUB_REF_NAME" && test "$s" = "$GITHUB_REF_NAME"
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npx vitest run test/unit
+      - run: npm publish --access public --provenance
+      - name: Update the MCP Registry
+        run: |
+          curl -sL https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz | tar xz mcp-publisher
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
