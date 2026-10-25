@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
           registry-url: https://registry.npmjs.org
       - name: package.json, server.json and the tag agree on the version
         run: |
@@ -36,8 +36,8 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npx vitest run test/unit
-      # Trusted Publishing needs npm 11.5.1 or later; upgraded only here, the tests run on the npm that ships with Node
-      - run: npm install -g npm@latest
+      # Trusted Publishing needs npm 11.5.1 or later; the build and tests run on Node 22 like CI
+      - run: npm install -g npm@^11.5.1
       - run: npm publish --access public --provenance
       - name: Update the MCP Registry
         run: |
