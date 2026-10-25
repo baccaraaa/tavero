@@ -14,6 +14,8 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # npm trusts this workflow only in this environment (Trusted Publisher settings on npmjs.com)
+    environment: tavero-git
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
