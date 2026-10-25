@@ -38,9 +38,17 @@ jobs:
       - run: npx vitest run test/unit
       # Trusted Publishing needs npm 11.5.1 or later; the build and tests run on Node 22 like CI
       - run: npm install -g npm@^11.5.1
-      - run: npm publish --access public --provenance
+      # a rerun skips a version that is already on npm, so a failed registry step can simply be run again
+      - name: Publish to npm
+        run: |
+          v="$(node -p "require('./package.json').version")"
+          if npm view "tavero@$v" version >/dev/null 2>&1; then echo "tavero@$v is already on npm"; else npm publish --access public --provenance; fi
       - name: Update the MCP Registry
         run: |
+          v="$(node -p "require('./package.json').version")"
+          # the registry checks npm, which takes a moment to serve a new version
+          for i in $(seq 1 30); do npm view "tavero@$v" version >/dev/null 2>&1 && break; sleep 10; done
           curl -sL https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz | tar xz mcp-publisher
           ./mcp-publisher login github-oidc
-          ./mcp-publisher publish
+          for i in 1 2 3 4 5; do ./mcp-publisher publish && exit 0; sleep 30; done
+          exit 1
